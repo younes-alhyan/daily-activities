@@ -5,20 +5,25 @@ import DaysNav from "./components/DaysNav";
 import DayProgressBar from "./components/DayProgressBar";
 import ActivityCard from "./components/ActivityCard";
 import type { Day } from "@/types/types";
+import LoadingPage from "./components/LoadingPage";
 
 export default function Home() {
   const [days, setDays] = useState<Day[]>([]);
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const { getDays, addDay, deleteDay, updateActivity } = useApi();
 
   useEffect(() => {
     const fetchDays = async () => {
       try {
+        setIsLoading(true);
         const fetchedDays = await getDays();
         setDays(fetchedDays);
         setCurrentDayIndex(fetchedDays.length > 0 ? fetchedDays.length - 1 : 0);
       } catch (error) {
         console.error("Failed to fetch days:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchDays();
@@ -74,6 +79,7 @@ export default function Home() {
   const currentDayProgress =
     days[currentDayIndex]?.activities.filter((a) => a.state).length ?? 0;
 
+  if (isLoading) return <LoadingPage />;
   if (days.length < 1) return null;
   
   return (
