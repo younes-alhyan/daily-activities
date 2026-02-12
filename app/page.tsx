@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useAuth } from "./hooks/useAuth";
 import useApi from "./hooks/useApi";
 import DaysNav from "./components/DaysNav";
 import DayProgressBar from "./components/DayProgressBar";
@@ -10,7 +9,6 @@ import type { Day } from "@/types/types";
 export default function Home() {
   const [days, setDays] = useState<Day[]>([]);
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
-  const { token } = useAuth();
   const { getDays, addDay, deleteDay, updateActivity } = useApi();
 
   useEffect(() => {
