@@ -15,33 +15,31 @@ export interface ActivityInterface {
   description: string;
   state: boolean;
 }
-export interface Activity extends ActivityInterface {
-  id: string;
-}
 export interface ActivityDoc extends ActivityInterface {
   _id: Types.ObjectId;
 }
-
-// Activities Interface
-export interface ActivitiesInterface {
-  activities: Activity[];
-}
-export interface Activities extends ActivitiesInterface {
+export interface Activity extends ActivityInterface {
   id: string;
 }
-export interface ActivitiesDoc extends ActivitiesInterface {
+
+// Activities Interface
+export interface ActivitiesDoc {
   _id: Types.ObjectId;
+  activities: ActivityDoc[];
+}
+export interface Activities {
+  id: string;
+  activities: Activity[];
 }
 
 // User Activities Interface
-export interface UserActivitiesInterface {
-  userActivities: Activities[];
-}
-export interface UserActivities extends UserActivitiesInterface {
-  id: string;
-  userId: string;
-}
-export interface UserActivitiesDoc extends UserActivitiesInterface {
+export interface UserActivitiesDoc {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
+  userActivities: ActivitiesDoc[];
+}
+export interface UserActivities {
+  id: string;
+  userId: string;
+  userActivities: Activities[];
 }
