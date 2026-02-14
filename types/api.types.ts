@@ -1,45 +1,28 @@
+import type { HTTP_METHOD } from "next/dist/server/web/http";
+import type { User, UserLogin } from "@/types/user.types";
+import type { Activities } from "@/types/userActivities.types";
+
+export interface ApiRequest {
+  method: HTTP_METHOD;
+  url: string;
+  token?: string;
+  body?: any;
+}
+export interface ApiSuccess<T> {
+  ok: true;
+  status: number;
+  message: string;
+  data?: T;
+}
 export interface ApiError {
+  ok: false;
   status: number;
   code: string;
   message: string;
 }
 
-export const BAD_REQUEST_ERROR: (message?: string) => ApiError = (
-  message?: string,
-) => ({
-  status: 400,
-  code: "BAD_REQUEST",
-  message: message || "Bad request",
-});
+export type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
-export const UNAUTHORIZED_ERROR: (message?: string) => ApiError = (
-  message?: string,
-) => ({
-  status: 401,
-  code: "UNAUTHORIZED",
-  message: message || "Unauthorized access",
-});
-
-export const FORBIDDEN_ERROR: (message?: string) => ApiError = (
-  message?: string,
-) => ({
-  status: 403,
-  code: "FORBIDDEN",
-  message: message || "Forbidden",
-});
-
-export const NOT_FOUND_ERROR: (message?: string) => ApiError = (
-  message?: string,
-) => ({
-  status: 404,
-  code: "NOT_FOUND",
-  message: message || "Resource not found",
-});
-
-export const INTERNAL_SERVER_ERROR: (message?: string) => ApiError = (
-  message?: string,
-) => ({
-  status: 500,
-  code: "INTERNAL_SERVER_ERROR",
-  message: message || "Internal server error",
-});
+export type UserResponse = User;
+export type UserLoginLoginResponse = UserLogin;
+export type UserActivitiesResponse = { userActivities: Activities[] };
