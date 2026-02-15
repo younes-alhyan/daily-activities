@@ -1,12 +1,17 @@
 import { toObjectId } from "@/lib/utils/toObjectId";
+import { httpErrors } from "@/lib/http/httpErrors";
 import {
   getUserActivitiesService,
   addActivitiesService,
   deleteActivitiesService,
   updateUserActivityService,
 } from "@/server/services/userActivities.service";
-import type { ActivityInterface } from "@/types/userActivities.types";
-import { BAD_REQUEST_ERROR, NOT_FOUND_ERROR } from "@/types/error.types";
+import type { UserActivitiesResponse } from "@/types/api.types";
+import type {
+  ActivityInterface,
+  ActivitiesDoc,
+  Activities,
+} from "@/types/userActivities.types";
 
 const defaultActivities = [
   { type: "watching", description: "", state: false },
@@ -18,58 +23,59 @@ const defaultActivities = [
   { type: "watching", description: "", state: false },
 ] as const satisfies ActivityInterface[];
 
-const cleanUserActivities = (doc: any) => {
-  if (!doc) return null;
+const cleanUserActivities = (docs: ActivitiesDoc[]): Activities[] => {
+  return docs.map((day) => {
+    const { _id, ...restDay } = day;
 
-  const obj =
-    doc?.toObject?.({ versionKey: false, getters: false, virtuals: false }) ??
-    doc;
-
-  return {
-    id: String(obj._id),
-    userId: String(obj.userId),
-    userActivities: (obj.userActivities ?? []).map((day: any) => ({
-      id: String(day._id),
-      activities: (day.activities ?? []).map((a: any) => ({
-        id: String(a._id),
-        type: a.type,
-        description: a.description,
-        state: a.state,
-      })),
-    })),
-  };
+    return {
+      id: _id.toString(),
+      ...restDay,
+      activities: day.activities.map((activity) => {
+        const { _id, ...restAct } = activity;
+        return { id: _id.toString(), ...restAct };
+      }),
+    };
+  });
 };
 
-export async function getUserActivitiesController(userId: string) {
+export async function getUserActivitiesController(
+  userId: string,
+): Promise<UserActivitiesResponse> {
+  if (!userId) {
+    throw httpErrors.BAD_REQUEST_ERROR("userId is required");
+  }
+
   const doc = await getUserActivitiesService(toObjectId(userId, "userId"));
-  if (!doc) throw NOT_FOUND_ERROR("User activities not found");
-  return cleanUserActivities(doc);
+  return { userActivities: cleanUserActivities(doc) };
 }
 
-export async function addActivitiesController(userId: string) {
-  const activities: ActivityInterface[] = defaultActivities.map((a) => ({
-    ...a,
-  }));
+export async function addActivitiesController(
+  userId: string,
+): Promise<UserActivitiesResponse> {
+  if (!userId) {
+    throw httpErrors.BAD_REQUEST_ERROR("userId is required");
+  }
 
   const doc = await addActivitiesService(
     toObjectId(userId, "userId"),
-    activities,
+    defaultActivities,
   );
-  if (!doc) throw NOT_FOUND_ERROR("User activities not found");
-  return cleanUserActivities(doc);
+
+  return { userActivities: cleanUserActivities(doc) };
 }
 
 export async function deleteActivitiesController(
   userId: string,
   activitiesId: string,
-) {
-  const doc = await deleteActivitiesService(
+): Promise<void> {
+  if (!userId) {
+    throw httpErrors.BAD_REQUEST_ERROR("userId is required");
+  }
+
+  await deleteActivitiesService(
     toObjectId(userId, "userId"),
     toObjectId(activitiesId, "activitiesId"),
   );
-
-  if (!doc) throw NOT_FOUND_ERROR("User activities not found");
-  return cleanUserActivities(doc);
 }
 
 export async function updateUserActivityController(
@@ -78,12 +84,15 @@ export async function updateUserActivityController(
   id: string,
   description: string,
   state: boolean,
-) {
-  if (typeof description !== "string") {
-    throw BAD_REQUEST_ERROR("description must be a string");
-  }
-  if (typeof state !== "boolean") {
-    throw BAD_REQUEST_ERROR("state must be a boolean");
+): Promise<UserActivitiesResponse> {
+  if (
+    !userId ||
+    !activitiesId ||
+    !id ||
+    typeof description !== "string" ||
+    typeof state !== "boolean"
+  ) {
+    throw httpErrors.BAD_REQUEST_ERROR("All fields are required");
   }
 
   const doc = await updateUserActivityService(
@@ -94,6 +103,5 @@ export async function updateUserActivityController(
     state,
   );
 
-  if (!doc) throw NOT_FOUND_ERROR("Activity not found");
-  return cleanUserActivities(doc);
+  return { userActivities: cleanUserActivities(doc) };
 }
