@@ -1,8 +1,12 @@
 import mongoose from "mongoose";
+import { httpErrors } from "@/lib/http/httpErrors";
 
-const MONGODB_URI = process.env.MONGODB_URI || "";
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
-if (!MONGODB_URI) throw new Error("Missing MONGODB_URI");
+if (!MONGODB_URI) {
+  console.error("Missing MONGODB_URI environment variable");
+  throw httpErrors.INTERNAL_SERVER_ERROR();
+}
 
 let cached = (global as any).mongoose;
 if (!cached) cached = (global as any).mongoose = { conn: null, promise: null };
