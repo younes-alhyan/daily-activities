@@ -4,7 +4,7 @@ import {
   getUserActivitiesService,
   addActivitiesService,
   deleteActivitiesService,
-  updateUserActivityService,
+  updateActivitiesService,
 } from "@/server/services/userActivities.service";
 import type { UserActivitiesResponse } from "@/types/api.types";
 import type {
@@ -78,7 +78,7 @@ export async function deleteActivitiesController(
   );
 }
 
-export async function updateUserActivityController(
+export async function updateActivitiesController(
   userId: string,
   activitiesId: string,
   id: string,
@@ -95,7 +95,7 @@ export async function updateUserActivityController(
     throw httpErrors.BAD_REQUEST_ERROR("All fields are required");
   }
 
-  const doc = await updateUserActivityService(
+  const doc = await updateActivitiesService(
     toObjectId(userId, "userId"),
     toObjectId(activitiesId, "activitiesId"),
     toObjectId(id, "activityId"),
