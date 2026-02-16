@@ -8,7 +8,7 @@ import {
   deleteUserService,
 } from "@/server/services/user.service";
 import type { UserInterface, UserDoc, User } from "@/types/user.types";
-import type { UserResponse, UserLoginLoginResponse } from "@/types/api.types";
+import type { UserResponse, UserLoginResponse } from "@/types/api.types";
 
 const cleanUser = (doc: UserDoc): User => {
   const { _id, username, password } = doc;
@@ -28,7 +28,7 @@ export async function addUserController(
 
 export async function loginUserController(
   user: UserInterface,
-): Promise<UserLoginLoginResponse> {
+): Promise<UserLoginResponse> {
   if (!user.username || !user.password) {
     throw httpErrors.BAD_REQUEST_ERROR("Username and password are required");
   }
