@@ -1,6 +1,7 @@
-import type { HTTP_METHOD } from "next/dist/server/web/http";
 import type { User, UserLogin } from "@/types/user.types";
 import type { Activities } from "@/types/userActivities.types";
+
+type HTTP_METHOD = "GET" | "POST" | "PUT" | "DELETE";
 
 export interface ApiRequest {
   method: HTTP_METHOD;
