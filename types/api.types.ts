@@ -24,5 +24,5 @@ export interface ApiError {
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
 export type UserResponse = User;
-export type UserLoginLoginResponse = UserLogin;
+export type UserLoginResponse = UserLogin;
 export type UserActivitiesResponse = { userActivities: Activities[] };
