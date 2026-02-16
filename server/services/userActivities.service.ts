@@ -46,7 +46,7 @@ export async function deleteActivitiesService(
   if (!doc) throw httpErrors.NOT_FOUND_ERROR("User activities not found");
 }
 
-export async function updateUserActivityService(
+export async function updateActivitiesService(
   userId: Types.ObjectId,
   activitiesId: Types.ObjectId,
   id: Types.ObjectId,
