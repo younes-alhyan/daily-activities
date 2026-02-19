@@ -1,60 +1,74 @@
 "use client";
-import { useAuth } from "./useAuth";
-import type { Day, Activity } from "@/types/types";
+import { httpRequest } from "@/lib/http/httpRequest";
+import { useAuth } from "@/app/contexts/AuthContext";
+import type { ApiRequest, UserActivitiesResponse } from "@/types/api.types";
+
 export default function useApi() {
-  const { token } = useAuth();  
-  async function getDays(): Promise<Day[]> {
-    const res = await fetch("/api/days", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!res.ok) throw new Error("Failed to fetch days");
-    return res.json() || [];
+  const { token } = useAuth();
+
+  async function getUserActivities(): Promise<UserActivitiesResponse> {
+    const request: ApiRequest = {
+      url: "/api/userActivities",
+      method: "GET",
+      token,
+    };
+    const res = await httpRequest<UserActivitiesResponse>(request);
+
+    if (!res.ok) throw new Error(res.message);
+    if (!res.data) throw new Error("Missing Response Data");
+
+    return res.data;
   }
-  async function addDay(): Promise<Day> {
-    const res = await fetch("/api/days", {
+
+  async function addActivities(): Promise<UserActivitiesResponse> {
+    const request: ApiRequest = {
+      url: "/api/userActivities",
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!res.ok) throw new Error("Failed to add day");
-    return res.json();
+      token,
+    };
+    const res = await httpRequest<UserActivitiesResponse>(request);
+
+    if (!res.ok) throw new Error(res.message);
+    if (!res.data) throw new Error("Missing Response Data");
+
+    return res.data;
   }
-  async function deleteDay(id: string): Promise<boolean> {
-    const res = await fetch(`/api/days?id=${id}`, {
+
+  async function deleteActivities(id: string): Promise<void> {
+    const request: ApiRequest = {
+      url: `/api/userActivities?id=${id}`,
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!res.ok) throw new Error("Failed to delete day");
-    return true;
+      token,
+    };
+    const res = await httpRequest(request);
+
+    if (!res.ok) throw new Error(res.message);
   }
-  async function updateActivity(
-    dayId: string,
+
+  async function updateActivities(
+    id: string,
     activityId: string,
     description: string,
     state: boolean,
-  ): Promise<Activity> {
-    {
-      const res = await fetch("/api/days", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: dayId,
-          activityId,
-          description,
-          state,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to update activity");
-      return res.json();
-    }
+  ): Promise<UserActivitiesResponse> {
+    const request: ApiRequest = {
+      url: "/api/userActivities",
+      method: "PUT",
+      token,
+      body: { id, activityId, description, state },
+    };
+    const res = await httpRequest<UserActivitiesResponse>(request);
+
+    if (!res.ok) throw new Error(res.message);
+    if (!res.data) throw new Error("Missing Response Data");
+
+    return res.data;
   }
-  return { getDays, addDay, deleteDay, updateActivity };
+
+  return {
+    getUserActivities,
+    addActivities,
+    deleteActivities,
+    updateActivities,
+  };
 }
