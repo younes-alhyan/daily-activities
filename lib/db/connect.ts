@@ -15,11 +15,21 @@ export async function connectDB() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        bufferCommands: false,
+      })
+      .catch((err) => {
+        console.error("MongoDB connection failed:", err);
+        cached.promise = null; // allow retry
+        throw httpErrors.INTERNAL_SERVER_ERROR();
+      });
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  try {
+    cached.conn = await cached.promise;
+    return cached.conn;
+  } catch {
+    throw httpErrors.INTERNAL_SERVER_ERROR();
+  }
 }
