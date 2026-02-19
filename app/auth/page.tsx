@@ -1,10 +1,13 @@
 "use client";
+import { useMemo, useState } from "react";
+import { useAuth } from "@/app/contexts/AuthContext";
 
-import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "../hooks/useAuth";
+type Mode = "login" | "signup";
 
 export default function AuthPage() {
-  const { token, login } = useAuth();
+  const { login, signup } = useAuth();
+
+  const [mode, setMode] = useState<Mode>("login");
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +17,7 @@ export default function AuthPage() {
 
   const disabled = useMemo(
     () => isLoading || !username.trim() || !password,
-    [isLoading, username, password]
+    [isLoading, username, password],
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,10 +26,20 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      await login(username.trim(), password);
+      const u = username.trim();
+
+      if (mode === "login") {
+        await login({ username: u, password });
+      } else {
+        if (!signup) throw new Error("Signup is not configured");
+        await signup({ username: u, password });
+
+        // optional: auto-switch to login after signup
+        setMode("login");
+      }
     } catch (err: any) {
-      setErrorMsg(err?.message ?? "Login failed. Check your credentials.");
-      console.error("Login failed:", err);
+      setErrorMsg(err?.message ?? "Auth failed. Try again.");
+      console.error("Auth failed:", err);
     } finally {
       setIsLoading(false);
     }
@@ -39,14 +52,16 @@ export default function AuthPage() {
         <div className="mb-6 text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-bg-card px-3 py-1">
             <span className="h-2 w-2 rounded-full bg-accent-green shadow-[0_0_12px_rgba(34,197,94,0.35)]" />
-            <span className="text-xs text-text-secondary">
-              Secure access
-            </span>
+            <span className="text-xs text-text-secondary">Secure access</span>
           </div>
 
-          <h1 className="mt-4 text-3xl font-bold tracking-tight">Login</h1>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight">
+            {mode === "login" ? "Login" : "Sign up"}
+          </h1>
           <p className="mt-2 text-sm text-text-secondary">
-            Enter your credentials to continue.
+            {mode === "login"
+              ? "Enter your credentials to continue."
+              : "Create an account to get started."}
           </p>
         </div>
 
@@ -56,6 +71,38 @@ export default function AuthPage() {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[rgba(255,255,255,0.10)] to-transparent" />
 
           <form onSubmit={handleSubmit} className="p-6 sm:p-7">
+            {/* Mode toggle */}
+            <div className="mb-5 flex rounded-xl border border-border bg-bg-main p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMsg(null);
+                  setMode("login");
+                }}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer ${
+                  mode === "login"
+                    ? "bg-bg-card text-text-primary"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMsg(null);
+                  setMode("signup");
+                }}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer ${
+                  mode === "signup"
+                    ? "bg-bg-card text-text-primary"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                Sign up
+              </button>
+            </div>
+
             {errorMsg && (
               <div className="mb-4 rounded-xl border border-[rgba(239,68,68,0.25)] bg-[rgba(239,68,68,0.08)] px-3 py-2 text-sm text-text-primary">
                 <div className="flex items-start gap-2">
@@ -82,12 +129,14 @@ export default function AuthPage() {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm text-text-secondary)]">
+                <label className="mb-1.5 block text-sm text-text-secondary">
                   Password
                 </label>
                 <input
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete={
+                    mode === "login" ? "current-password" : "new-password"
+                  }
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -99,21 +148,56 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={disabled}
-                className="group relative w-full overflow-hidden rounded-xl border border-[rgba(59,130,246,0.25)] bg-[rgba(59,130,246,  0.12)] px-4 py-2.5 font-semibold text-text-primary transition
+                className="group relative w-full overflow-hidden rounded-xl border border-[rgba(59,130,246,0.25)] bg-[rgba(59,130,246,0.12)] px-4 py-2.5 font-semibold text-text-primary transition
                            hover:bg-[rgba(59,130,246,0.18)] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
                 <span className="absolute inset-0 opacity-0 transition group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.25),transparent_60%)]" />
                 <span className="relative">
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading
+                    ? mode === "login"
+                      ? "Logging in..."
+                      : "Creating account..."
+                    : mode === "login"
+                      ? "Login"
+                      : "Sign up"}
                 </span>
               </button>
 
-
+              {/* Small helper text */}
+              <p className="text-center text-xs text-text-secondary">
+                {mode === "login" ? (
+                  <>
+                    Don&apos;t have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setErrorMsg(null);
+                        setMode("signup");
+                      }}
+                      className="text-text-primary underline underline-offset-4 hover:opacity-80 cursor-pointer"
+                    >
+                      Sign up
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setErrorMsg(null);
+                        setMode("login");
+                      }}
+                      className="text-text-primary underline underline-offset-4 hover:opacity-80 cursor-pointer"
+                    >
+                      Login
+                    </button>
+                  </>
+                )}
+              </p>
             </div>
           </form>
         </div>
-
-
       </div>
     </div>
   );
