@@ -1,24 +1,35 @@
 "use client";
-
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import LoadingPage from "../components/LoadingPage";
+import { httpRequest } from "@/lib/http/httpRequest";
+import LoadingPage from "@/app/components/LoadingPage";
+import { UserInterface } from "@/types/user.types";
+import type {
+  ApiRequest,
+  UserResponse,
+  UserLoginResponse,
+} from "@/types/api.types";
 
 type AuthContextType = {
   token: string;
-  login: (username: string, password: string) => Promise<void>;
+  signup: (user: UserInterface) => Promise<void>;
+  login: (user: UserInterface) => Promise<void>;
+  logout: () => void;
 };
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined,
-);
+export const AuthContext = createContext<AuthContextType>({
+  token: "",
+  signup: async () => {},
+  login: async () => {},
+  logout: () => {},
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
   const [token, setToken] = useState<string>("");
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const goTo = (path: string) => {
     if (pathname !== path) {
@@ -34,32 +45,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (pathname !== targetPath) {
       router.replace(targetPath);
+      return;
     }
 
-    setIsLoaded(true);
-  }, []);
+    setIsLoading(false);
+  }, [pathname, router]);
 
-  const login = async (username: string, password: string) => {
-    const res = await fetch("/api/auth", {
+  const signup = async (user: UserInterface) => {
+    const request: ApiRequest = {
+      url: "/api/user/signup",
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+      body: user,
+    };
+    const res = await httpRequest<UserResponse>(request);
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || "Login failed");
-    }
+    if (!res.ok) throw new Error(res.message);
 
-    const data = await res.json();
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
+    login(user);
+  };
+
+  const login = async (user: UserInterface) => {
+    const request: ApiRequest = {
+      url: "/api/user/login",
+      method: "POST",
+      body: user,
+    };
+    const res = await httpRequest<UserLoginResponse>(request);
+
+    if (!res.ok) throw new Error(res.message);
+    if (!res.data) throw new Error("Missing Response Data");
+
+    localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
     goTo("/");
   };
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken("");
+    goTo("/auth");
+  };
+
+  if (isLoading) return <LoadingPage />;
+
   return (
-    <AuthContext.Provider value={{ token, login }}>
-      {isLoaded ? children : <LoadingPage />}
+    <AuthContext.Provider value={{ token, signup, login, logout }}>
+      {children}
     </AuthContext.Provider>
   );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 }
