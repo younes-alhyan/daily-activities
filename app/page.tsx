@@ -1,100 +1,106 @@
 "use client";
 import { useState, useEffect } from "react";
-import useApi from "./hooks/useApi";
-import DaysNav from "./components/DaysNav";
-import DayProgressBar from "./components/DayProgressBar";
-import ActivityCard from "./components/ActivityCard";
-import type { Day } from "@/types/types";
-import LoadingPage from "./components/LoadingPage";
+import useApi from "@/app/hooks/useApi";
+import UserActivitiesNav from "@/app/components/UserActivitiesNav";
+import ActivitiesProgressBar from "@/app/components/ActivitiesProgressBar";
+import ActivityCard from "@/app/components/ActivityCard";
+import LoadingPage from "@/app/components/LoadingPage";
+import type { Activities } from "@/types/userActivities.types";
 
-export default function Home() {
-  const [days, setDays] = useState<Day[]>([]);
-  const [currentDayIndex, setCurrentDayIndex] = useState(0);
+export default function HomePage() {
+  const [userActivities, setUserActivities] = useState<Activities[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const { getDays, addDay, deleteDay, updateActivity } = useApi();
+  const {
+    getUserActivities,
+    addActivities,
+    deleteActivities,
+    updateActivities,
+  } = useApi();
 
   useEffect(() => {
-    const fetchDays = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedDays = await getDays();
-        setDays(fetchedDays);
-        setCurrentDayIndex(fetchedDays.length > 0 ? fetchedDays.length - 1 : 0);
-      } catch (error) {
-        console.error("Failed to fetch days:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    const fetchUserActivities = async () => {
+      setIsLoading(true);
+      const { userActivities } = await getUserActivities();
+      setUserActivities(userActivities);
+      setSelectedIndex(
+        userActivities.length > 0 ? userActivities.length - 1 : 0,
+      );
+      setIsLoading(false);
     };
-    fetchDays();
+    fetchUserActivities();
   }, []);
 
-  const onAddDay = async () => {
-    try {
-      const newDay = await addDay();
-      setDays((prev) => [...prev, newDay]);
-      setCurrentDayIndex(days.length);
-    } catch (error) {
-      console.error("Failed to add day:", error);
-    }
+  const onAddActivities = async () => {
+    const { userActivities: next } = await addActivities();
+    setUserActivities(next);
+    setSelectedIndex(next.length - 1);
   };
-  const onDeleteDay = async () => {
-    try {
-      await deleteDay(days[currentDayIndex].id);
-      setDays((prev) =>
-        prev.filter((day) => day.id !== days[currentDayIndex].id),
-      );
-      setCurrentDayIndex(Math.max(0, currentDayIndex - 1));
-    } catch (error) {
-      console.error("Failed to delete day:", error);
-    }
+
+  const onDeleteActivities = async () => {
+    await deleteActivities(userActivities[selectedIndex].id);
+    setUserActivities((prev) =>
+      prev.filter(
+        (activity) => activity.id !== userActivities[selectedIndex].id,
+      ),
+    );
+    setSelectedIndex(Math.max(0, selectedIndex - 1));
   };
+
   const onActivityChange = async (
-    id: string,
+    activityId: string,
     description: string,
     state: boolean,
   ) => {
-    try {
-      await updateActivity(days[currentDayIndex].id, id, description, state);
+    const { userActivities: next } = await updateActivities(
+      userActivities[selectedIndex].id,
+      activityId,
+      description,
+      state,
+    );
 
-      setDays((prevDays) =>
-        prevDays.map((day, dIndex) =>
-          dIndex !== currentDayIndex
-            ? day
-            : {
-                ...day,
-                activities: day.activities.map((activity) =>
-                  activity.id !== id
-                    ? activity
-                    : { ...activity, description, state },
-                ) as Day["activities"],
-              },
-        ),
-      );
-    } catch (error) {
-      console.error("Failed to update activity:", error);
-    }
+    setUserActivities(next);
   };
 
-  const currentDayProgress =
-    days[currentDayIndex]?.activities.filter((a) => a.state).length ?? 0;
-
   if (isLoading) return <LoadingPage />;
-  if (days.length < 1) return null;
-  
+  if (userActivities.length < 1) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center gap-6 px-4">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-700">No days yet</h2>
+          <p className="text-gray-500 mt-2">
+            Start tracking your activities by creating your first day.
+          </p>
+        </div>
+
+        <button
+          onClick={onAddActivities}
+          className="bg-gray-800 hover:bg-gray-700 transition-colors text-white font-medium py-2 px-6 rounded-lg shadow-sm"
+        >
+          + Add New Day
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full flex justify-center py-8 md:px-4">
       <div className="w-full max-w-4xl flex flex-col">
-        <DaysNav
-          currentDayIndex={currentDayIndex}
-          setCurrentDayIndex={(index) => setCurrentDayIndex(index)}
-          daysCount={days.length}
-          onAddDay={onAddDay}
-          onDeleteDay={onDeleteDay}
+        <UserActivitiesNav
+          selectedIndex={selectedIndex}
+          setSelectedIndex={(index: number) => setSelectedIndex(index)}
+          userActivitiesCount={userActivities.length}
+          onAddActivities={onAddActivities}
+          onDeleteActivities={onDeleteActivities}
         />
-        <DayProgressBar progress={currentDayProgress} />
+        <ActivitiesProgressBar
+          progress={
+            userActivities[selectedIndex].activities.filter((a) => a.state)
+              .length ?? 0
+          }
+        />
         <div className="flex flex-col gap-4 mt-4">
-          {days[currentDayIndex].activities.map((activity) => (
+          {userActivities[selectedIndex].activities.map((activity) => (
             <ActivityCard
               key={activity.id}
               activity={activity}
