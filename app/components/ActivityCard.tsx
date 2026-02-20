@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
 import { Film, Gamepad2, Code, BookOpen, Check } from "lucide-react";
-import type { Activity, ActivityType } from "@/types/types";
+import type { Activity, ActivityType } from "@/types/userActivities.types";
 
 interface ActivityCardProps {
   activity: Activity;
-  onActivityChange: (id: string, description: string, state: boolean) => void;
+  onActivityChange: (activityId: string, description: string, state: boolean) => void;
 }
 
 const activitiesMap: Record<

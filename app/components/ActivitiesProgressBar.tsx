@@ -1,7 +1,9 @@
-interface DayProgressBarProps {
+interface ActivitiesProgressBarProps {
   progress: number;
 }
-export default function DayProgressBar({ progress }: DayProgressBarProps) {
+export default function ActivitiesProgressBar({
+  progress,
+}: ActivitiesProgressBarProps) {
   return (
     <div className="w-full flex flex-col my-4 px-2">
       <div className="w-full flex items-center justify-between">
