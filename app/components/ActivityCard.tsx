@@ -37,7 +37,7 @@ export default function ActivityCard({
   const activityInfo = activitiesMap[activity.type];
   return (
     <div
-      className={`flex flex-col p-4 gap-2 bg-bg-card rounded-md transition-all duration-200 ease-out border border-border hover:border-[rgba(255,255,255,0.08)] ${activity.state ? "opacity-50" : "opacity-100"}`}
+      className={`flex flex-col p-4 gap-2 bg-card rounded-md transition-all duration-200 ease-out border border-border hover:border-[rgba(255,255,255,0.08)] ${activity.state ? "opacity-50" : "opacity-100"}`}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
@@ -58,11 +58,11 @@ export default function ActivityCard({
           onClick={() => handleStateChange()}
           className={`h-6 w-6 grid place-items-center rounded-sm border-2 cursor-pointer
           transition-colors duration-200 ease-out
-          ${activity.state ? "bg-accent-green border-accent-green" : "bg-bg-card border-border"}
+          ${activity.state ? "bg-accent-green border-accent-green" : "bg-card border-border"}
         `}
         >
           {activity.state && (
-            <Check className="w-4 h-4 text-bg-card transition-opacity duration-200 ease-out" />
+            <Check className="w-4 h-4 text-card transition-opacity duration-200 ease-out" />
           )}
         </button>
       </div>
@@ -86,7 +86,7 @@ export default function ActivityCard({
             el.style.height = "auto";
             el.style.height = `${el.scrollHeight}px`;
           }}
-          className="mt-2 w-full px-2 py-1.5 text-sm bg-bg-card text-text-primary rounded-md border border-border shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] resize-none overflow-hidden outline-none transition-all duration-200 ease-out focus:border-transparent focus:ring-2 focus:ring-(--color-border) focus:shadow-[0_0_0_1px_rgba(255,255,255,0.04)]"
+          className="mt-2 w-full px-2 py-1.5 text-sm bg-card text-text-primary rounded-md border border-border shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] resize-none overflow-hidden outline-none transition-all duration-200 ease-out focus:border-transparent focus:ring-2 focus:ring-(--color-border) focus:shadow-[0_0_0_1px_rgba(255,255,255,0.04)]"
         />
       ) : (
         <p

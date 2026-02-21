@@ -21,7 +21,7 @@ export default function UserActivitiesNav({
         {selectedIndex > 0 ? (
           <button
             onClick={() => setSelectedIndex(selectedIndex - 1)}
-            className="p-2 rounded-sm hover:bg-bg-card transition-colors cursor-pointer"
+            className="p-2 rounded-sm hover:bg-card transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-5 h-5 text-text-muted" />
           </button>
@@ -32,7 +32,7 @@ export default function UserActivitiesNav({
         {selectedIndex < userActivitiesCount - 1 && (
           <button
             onClick={() => setSelectedIndex(selectedIndex + 1)}
-            className="p-2 rounded-sm hover:bg-bg-card transition-colors cursor-pointer"
+            className="p-2 rounded-sm hover:bg-card transition-colors cursor-pointer"
           >
             <ChevronRight className="w-5 h-5 text-text-muted" />
           </button>
@@ -42,13 +42,13 @@ export default function UserActivitiesNav({
       <div className="flex items-center gap-4">
         <button
           onClick={onAddActivities}
-          className="p-2 rounded-sm hover:bg-bg-card transition-colors cursor-pointer group"
+          className="p-2 rounded-sm hover:bg-card transition-colors cursor-pointer group"
         >
           <Plus className="w-5 h-5 text-text-muted group-hover:text-accent-blue" />
         </button>
         <button
           onClick={onDeleteActivities}
-          className="p-2 rounded-sm hover:bg-bg-card transition-colors cursor-pointer group"
+          className="p-2 rounded-sm hover:bg-card transition-colors cursor-pointer group"
         >
           <Trash2 className="w-5 h-5 text-text-muted group-hover:text-accent-red" />
         </button>
