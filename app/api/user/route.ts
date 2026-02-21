@@ -1,6 +1,6 @@
 import { httpRoute } from "@/lib/http/httpRoute";
 import { httpResponse } from "@/lib/http/httpResponse";
-import { authMiddleware } from "@/lib/middleware/authMiddleware";
+import { authMiddleware } from "@/lib/middlewares/authMiddleware";
 import {
   updateUserController,
   deleteUserController,
