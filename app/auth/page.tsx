@@ -46,11 +46,11 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-bg-main text-text-primary flex items-center justify-center px-4">
+    <div className="min-h-screen w-full bg-primary text-text-primary flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Top label */}
         <div className="mb-6 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-bg-card px-3 py-1">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1">
             <span className="h-2 w-2 rounded-full bg-accent-green shadow-[0_0_12px_rgba(34,197,94,0.35)]" />
             <span className="text-xs text-text-secondary">Secure access</span>
           </div>
@@ -66,13 +66,13 @@ export default function AuthPage() {
         </div>
 
         {/* Panel */}
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-bg-card shadow-[0_10px_30px_rgba(0,0,0,0.55)]">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-[0_10px_30px_rgba(0,0,0,0.55)]">
           {/* subtle top glow line */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[rgba(255,255,255,0.10)] to-transparent" />
 
           <form onSubmit={handleSubmit} className="p-6 sm:p-7">
             {/* Mode toggle */}
-            <div className="mb-5 flex rounded-xl border border-border bg-bg-main p-1">
+            <div className="mb-5 flex rounded-xl border border-border bg-primary p-1">
               <button
                 type="button"
                 onClick={() => {
@@ -81,7 +81,7 @@ export default function AuthPage() {
                 }}
                 className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer ${
                   mode === "login"
-                    ? "bg-bg-card text-text-primary"
+                    ? "bg-card text-text-primary"
                     : "text-text-secondary hover:text-text-primary"
                 }`}
               >
@@ -95,7 +95,7 @@ export default function AuthPage() {
                 }}
                 className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer ${
                   mode === "signup"
-                    ? "bg-bg-card text-text-primary"
+                    ? "bg-card text-text-primary"
                     : "text-text-secondary hover:text-text-primary"
                 }`}
               >
@@ -123,7 +123,7 @@ export default function AuthPage() {
                   placeholder="your_username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-bg-main px-3 py-2.5 text-text-primary placeholder:text-text-muted outline-none transition
+                  className="w-full rounded-xl border border-border bg-primary px-3 py-2.5 text-text-primary placeholder:text-text-muted outline-none transition
                              focus:border-[rgba(59,130,246,0.45)] focus:ring-4 focus:ring-[rgba(59,130,246,0.12)]"
                 />
               </div>
@@ -140,7 +140,7 @@ export default function AuthPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-bg-main px-3 py-2.5 text-text-primary placeholder:text-text-muted outline-none transition
+                  className="w-full rounded-xl border border-border bg-primary px-3 py-2.5 text-text-primary placeholder:text-text-muted outline-none transition
                              focus:border-[rgba(59,130,246,0.45)] focus:ring-4 focus:ring-[rgba(59,130,246,0.12)]"
                 />
               </div>
