@@ -1,10 +1,12 @@
 import jwt from "jsonwebtoken";
+import { StringValue } from "ms";
 import { httpErrors } from "@/lib/http/httpErrors";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const REFRESH_SECRET = process.env.REFRESH_SECRET as string;
+const ACCESS_SECRET = process.env.ACCESS_SECRET as string;
 
-if (!JWT_SECRET) {
-  console.error("Missing JWT_SECRET environment variable");
+if (!REFRESH_SECRET || !ACCESS_SECRET) {
+  console.error("Missing REFRESH_SECRET or ACCESS_SECRET environment variable");
   throw httpErrors.INTERNAL_SERVER_ERROR();
 }
 
@@ -12,14 +14,14 @@ export interface JwtPayload {
   userId: string;
 }
 
-export const signToken = (userId: string) =>
-  jwt.sign({ userId }, JWT_SECRET, {
-    expiresIn: "7d",
+const signToken = (userId: string, secret: string, expiresIn: StringValue) =>
+  jwt.sign({ userId }, secret, {
+    expiresIn: expiresIn,
   });
 
-export const verifyToken = (token: string): JwtPayload => {
+const verifyToken = (token: string, secret: string): JwtPayload => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
 
     if (typeof decoded === "string") {
       throw httpErrors.UNAUTHORIZED_ERROR("Invalid token payload");
@@ -29,4 +31,38 @@ export const verifyToken = (token: string): JwtPayload => {
   } catch {
     throw httpErrors.UNAUTHORIZED_ERROR("Invalid or expired token");
   }
+};
+
+const RefreshToken = {
+  get: (req: Request) => {
+    const cookieHeader = req.headers.get("cookie") || "";
+    const cookies: Record<string, string> = {};
+    cookieHeader.split(";").forEach((cookie) => {
+      const [name, ...rest] = cookie.trim().split("=");
+      if (!name) return;
+      cookies[name] = rest.join("=");
+    });
+
+    const token = cookies.refreshToken;
+    if (!token) throw httpErrors.UNAUTHORIZED_ERROR("Refresh token missing");
+
+    return token;
+  },
+  sign: (userId: string) => signToken(userId, REFRESH_SECRET, "30d"),
+  verify: (token: string) => verifyToken(token, REFRESH_SECRET),
+};
+const AccessToken = {
+  get: (req: Request) => {
+    const authHeader = req.headers.get("Authorization") || "";
+    if (!authHeader?.startsWith("Bearer "))
+      throw httpErrors.UNAUTHORIZED_ERROR("Invalid Authorization header");
+    return authHeader.replace("Bearer ", "");
+  },
+  sign: (userId: string) => signToken(userId, ACCESS_SECRET, "1h"),
+  verify: (token: string) => verifyToken(token, ACCESS_SECRET),
+};
+
+export const Jwt = {
+  refreshToken: RefreshToken,
+  accessToken: AccessToken,
 };
