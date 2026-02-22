@@ -1,18 +1,15 @@
+import { Jwt } from "@/lib/utils/jwt";
 import { connectDB } from "@/lib/db/connect";
-import { verifyToken } from "@/lib/utils/jwt";
-import { toObjectId } from "@/lib/utils/toObjectId";
 import { httpErrors } from "@/lib/http/httpErrors";
+import { toObjectId } from "@/lib/utils/toObjectId";
 import { UserModel } from "@/server/models/user.model";
 
-export async function authMiddleware(req: Request) {
+export async function authMiddleware(req: Request, isRefresh?: true) {
   await connectDB();
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer "))
-    throw httpErrors.UNAUTHORIZED_ERROR("Invalid Authorization header");
-
-  const token = authHeader.replace("Bearer ", "");
-  const payload = verifyToken(token);
+  const { get, verify } = isRefresh ? Jwt.refreshToken : Jwt.accessToken;
+  const token = get(req);
+  const payload = verify(token);
 
   const userExists = await UserModel.exists({
     _id: toObjectId(payload.userId),
