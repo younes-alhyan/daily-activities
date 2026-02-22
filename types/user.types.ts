@@ -1,16 +1,13 @@
 import { Types } from "mongoose";
 
-export interface UserInterface {
+export interface UserInput {
   username: string;
   password: string;
 }
-export interface UserDoc extends UserInterface {
+export interface UserDoc extends UserInput {
   _id: Types.ObjectId;
 }
-export interface User {
+export interface UserDTO {
   id: string;
   username: string;
-}
-export interface UserLogin extends User {
-  token: string;
 }
