@@ -10,15 +10,15 @@ export const activityTypes = [
 export type ActivityType = (typeof activityTypes)[number];
 
 // Activity Interface
-export interface ActivityInterface {
+export interface ActivityInput {
   type: ActivityType;
   description: string;
   state: boolean;
 }
-export interface ActivityDoc extends ActivityInterface {
+export interface ActivityDoc extends ActivityInput {
   _id: Types.ObjectId;
 }
-export interface Activity extends ActivityInterface {
+export interface ActivityDTO extends ActivityInput {
   id: string;
 }
 
@@ -27,9 +27,9 @@ export interface ActivitiesDoc {
   _id: Types.ObjectId;
   activities: ActivityDoc[];
 }
-export interface Activities {
+export interface ActivitiesDTO {
   id: string;
-  activities: Activity[];
+  activities: ActivityDTO[];
 }
 
 // User Activities Interface
@@ -38,8 +38,8 @@ export interface UserActivitiesDoc {
   userId: Types.ObjectId;
   userActivities: ActivitiesDoc[];
 }
-export interface UserActivities {
+export interface UserActivitiesDTO {
   id: string;
   userId: string;
-  userActivities: Activities[];
+  userActivities: ActivitiesDTO[];
 }
