@@ -1,29 +1,17 @@
-import type { User, UserLogin } from "@/types/user.types";
-import type { Activities } from "@/types/userActivities.types";
+type HTTP_METHOD = "GET" | "POST" | "PATCH" | "DELETE";
 
-type HTTP_METHOD = "GET" | "POST" | "PUT" | "DELETE";
-
-export interface ApiRequest {
+export type ApiRequest<TokenT extends boolean = false, BodyT = undefined> = {
   method: HTTP_METHOD;
   url: string;
-  token?: string;
-  body?: any;
-}
-export interface ApiSuccess<T> {
-  ok: true;
+} & (TokenT extends true ? { token: string } : {}) &
+  (BodyT extends undefined ? {} : { body: BodyT });
+
+export type ApiResponse<SuccessT extends boolean = false, DataT = undefined> = {
+  ok: SuccessT;
   status: number;
   message: string;
-  data?: T;
-}
-export interface ApiError {
-  ok: false;
-  status: number;
-  code: string;
-  message: string;
-}
-
-export type ApiResponse<T> = ApiSuccess<T> | ApiError;
-
-export type UserResponse = User;
-export type UserLoginResponse = UserLogin;
-export type UserActivitiesResponse = { userActivities: Activities[] };
+} & (SuccessT extends false
+  ? { code: string }
+  : DataT extends undefined
+    ? {}
+    : { data: DataT });
