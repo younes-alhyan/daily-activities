@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 import { StringValue } from "ms";
-import { httpErrors } from "@/lib/http/httpErrors";
+import { Errors } from "@/lib/core/errors";
 
 const REFRESH_SECRET = process.env.REFRESH_SECRET as string;
 const ACCESS_SECRET = process.env.ACCESS_SECRET as string;
 
 if (!REFRESH_SECRET || !ACCESS_SECRET) {
   console.error("Missing REFRESH_SECRET or ACCESS_SECRET environment variable");
-  throw httpErrors.INTERNAL_SERVER_ERROR();
+  throw Errors.INTERNAL_SERVER_ERROR();
 }
 
 export interface JwtPayload {
@@ -24,12 +24,12 @@ const verifyToken = (token: string, secret: string): JwtPayload => {
     const decoded = jwt.verify(token, secret);
 
     if (typeof decoded === "string") {
-      throw httpErrors.UNAUTHORIZED_ERROR("Invalid token payload");
+      throw Errors.UNAUTHORIZED_ERROR("Invalid token payload");
     }
 
     return decoded as JwtPayload;
-  } catch {
-    throw httpErrors.UNAUTHORIZED_ERROR("Invalid or expired token");
+  } catch (error: unknown) {
+    throw Errors.UNAUTHORIZED_ERROR("Invalid or expired token");
   }
 };
 
@@ -44,7 +44,7 @@ const RefreshToken = {
     });
 
     const token = cookies.refreshToken;
-    if (!token) throw httpErrors.UNAUTHORIZED_ERROR("Refresh token missing");
+    if (!token) throw Errors.UNAUTHORIZED_ERROR("Refresh token missing");
 
     return token;
   },
@@ -55,7 +55,7 @@ const AccessToken = {
   get: (req: Request) => {
     const authHeader = req.headers.get("Authorization") || "";
     if (!authHeader?.startsWith("Bearer "))
-      throw httpErrors.UNAUTHORIZED_ERROR("Invalid Authorization header");
+      throw Errors.UNAUTHORIZED_ERROR("Invalid Authorization header");
     return authHeader.replace("Bearer ", "");
   },
   sign: (userId: string) => signToken(userId, ACCESS_SECRET, "1h"),
