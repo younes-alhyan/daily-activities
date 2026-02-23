@@ -1,10 +1,10 @@
 import { Schema, model, models, Model, Types } from "mongoose";
-import { activityTypes } from "@/types/userActivities.types";
+import { activityTypes } from "@/types/user-activities.types";
 import type {
   ActivityDoc,
   ActivitiesDoc,
   UserActivitiesDoc,
-} from "@/types/userActivities.types";
+} from "@/types/user-activities.types";
 
 const activitySchema = new Schema<ActivityDoc>({
   type: {
@@ -25,7 +25,7 @@ const activitySchema = new Schema<ActivityDoc>({
 const activitiesSchema = new Schema<ActivitiesDoc>({
   activities: {
     type: [activitySchema],
-    required: true,
+    default: [],
   },
 });
 
