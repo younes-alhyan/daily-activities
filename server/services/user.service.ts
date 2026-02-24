@@ -1,74 +1,35 @@
 import { Types } from "mongoose";
-import { connectDB } from "@/lib/db/connect";
-import { httpErrors } from "@/lib/http/httpErrors";
+import { Errors } from "@/lib/core/errors";
+import { runService } from "@/lib/db";
 import { UserModel } from "@/server/models/user.model";
-import { UserActivitiesModel } from "@/server/models/userActivities.model";
-import type { UserInterface, UserDoc } from "@/types/user.types";
+import { UserActivitiesModel } from "@/server/models/user-activities.model";
+import type { UserDoc } from "@/types/user.types";
 
-export async function addUserService(user: UserInterface): Promise<UserDoc> {
-  try {
-    await connectDB();
-
-    const { username, password } = user;
-
-    const doc = await UserModel.create({ username, password });
-    await UserActivitiesModel.create({
-      userId: doc._id,
-      userActivities: [],
-    });
-
+const getUser = (id: Types.ObjectId) =>
+  runService(async () => {
+    const doc = await UserModel.findById(id);
+    if (!doc) throw Errors.NOT_FOUND_ERROR("User not found");
     return doc.toObject<UserDoc>();
-  } catch (error: unknown) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      (error as any).code === 11000
-    ) {
-      throw httpErrors.CONFLICT_ERROR("Username already exists");
-    }
+  });
 
-    throw error;
-  }
-}
+const updateUser = (id: Types.ObjectId, user: Partial<UserDoc>) =>
+  runService(async () => {
+    const doc = await UserModel.findByIdAndUpdate(id, user, { new: true });
+    if (!doc) throw Errors.NOT_FOUND_ERROR("User not found");
+    return doc.toObject<UserDoc>();
+  });
 
-export async function loginUserService(user: UserInterface): Promise<UserDoc> {
-  await connectDB();
+const deleteUser = (id: Types.ObjectId) =>
+  runService(async () => {
+    const result = await UserModel.deleteOne({ _id: id });
+    if (result.deletedCount === 0)
+      throw Errors.NOT_FOUND_ERROR("User not found");
 
-  const { username, password } = user;
+    await UserActivitiesModel.deleteOne({ userId: id });
+  });
 
-  const doc = await UserModel.findOne({ username });
-  if (!doc) throw httpErrors.NOT_FOUND_ERROR("User not found");
-
-  const isMatch = await doc.comparePassword(password);
-  if (!isMatch) throw httpErrors.UNAUTHORIZED_ERROR("Invalid credentials");
-
-  return doc.toObject<UserDoc>();
-}
-
-export async function updateUserService(
-  id: Types.ObjectId,
-  user: Partial<UserInterface>,
-): Promise<UserDoc> {
-  await connectDB();
-
-  const { username, password } = user;
-
-  const doc = await UserModel.findById(id);
-  if (!doc) throw httpErrors.NOT_FOUND_ERROR("User not found");
-
-  if (username) doc.username = username;
-  if (password) doc.password = password;
-  await doc.save();
-
-  return doc.toObject<UserDoc>();
-}
-
-export async function deleteUserService(id: Types.ObjectId): Promise<void> {
-  await connectDB();
-
-  const doc = await UserModel.findByIdAndDelete(id);
-  if (!doc) throw httpErrors.NOT_FOUND_ERROR("User not found");
-
-  await UserActivitiesModel.findOneAndDelete({ userId: id });
-}
+export const UserService = {
+  get: getUser,
+  update: updateUser,
+  delete: deleteUser,
+};
