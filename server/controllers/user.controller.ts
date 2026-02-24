@@ -1,68 +1,43 @@
+import { Errors } from "@/lib/core/errors";
+import { cleanUser } from "@/lib/utils/cleanObject";
 import { toObjectId } from "@/lib/utils/toObjectId";
-import { signToken } from "@/lib/utils/jwt";
-import { httpErrors } from "@/lib/http/httpErrors";
-import {
-  addUserService,
-  loginUserService,
-  updateUserService,
-  deleteUserService,
-} from "@/server/services/user.service";
-import type { UserInterface, UserDoc, User } from "@/types/user.types";
-import type { UserResponse, UserLoginResponse } from "@/types/api.types";
+import { UserService } from "@/server/services/user.service";
+import type { UserDTO, UserInput } from "@/types/user.types";
 
-const cleanUser = (doc: UserDoc): User => {
-  const { _id, username, password } = doc;
-  return { id: String(_id), username };
+const getUser = async (id: string): Promise<UserDTO> => {
+  const doc = await UserService.get(toObjectId(id));
+  return cleanUser(doc);
 };
 
-export async function addUserController(
-  user: UserInterface,
-): Promise<UserResponse> {
-  if (!user.username || !user.password) {
-    throw httpErrors.BAD_REQUEST_ERROR("Username and password are required");
-  }
-
-  const doc = await addUserService(user);
-  return cleanUser(doc);
-}
-
-export async function loginUserController(
-  user: UserInterface,
-): Promise<UserLoginResponse> {
-  if (!user.username || !user.password) {
-    throw httpErrors.BAD_REQUEST_ERROR("Username and password are required");
-  }
-
-  const doc = await loginUserService(user);
-  const token = signToken(String(doc._id));
-
-  return {
-    ...cleanUser(doc),
-    token,
-  };
-}
-
-export async function updateUserController(
+const updateUser = async (
   id: string,
-  user: UserInterface,
-): Promise<UserResponse> {
-  const updateData: Partial<UserInterface> = {};
+  username: unknown,
+  password: unknown,
+): Promise<UserDTO> => {
+  const updateData: Partial<UserInput> = {};
 
-  if (user.username) updateData.username = user.username;
-  if (user.password) updateData.password = user.password;
+  if (typeof username === "string" && username.trim() !== "") {
+    updateData.username = username.trim();
+  }
+  if (typeof password === "string" && password.trim() !== "") {
+    updateData.password = password.trim();
+  }
 
   if (Object.keys(updateData).length === 0) {
-    throw httpErrors.BAD_REQUEST_ERROR("Username or password is required");
+    throw Errors.BAD_REQUEST_ERROR(
+      "At least one of username or password must be provided",
+    );
   }
 
-  const doc = await updateUserService(toObjectId(id, "userId"), updateData);
-
+  const doc = await UserService.update(toObjectId(id), updateData);
   return cleanUser(doc);
-}
+};
 
-export async function deleteUserController(id: string): Promise<void> {
-  if (!id) {
-    throw httpErrors.BAD_REQUEST_ERROR("User id is required");
-  }
-  await deleteUserService(toObjectId(id, "userId"));
-}
+const deleteUser = (id: string): Promise<void> =>
+  UserService.delete(toObjectId(id));
+
+export const UserController = {
+  get: getUser,
+  update: updateUser,
+  delete: deleteUser,
+};
