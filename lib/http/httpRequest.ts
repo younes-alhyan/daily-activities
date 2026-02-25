@@ -1,43 +1,43 @@
-import { httpErrors } from "@/lib/http/httpErrors";
-import type {
-  ApiRequest,
-  ApiResponse,
-  ApiSuccess,
-  ApiError,
-} from "@/types/api.types";
+import { ApiError, Errors } from "@/lib/core/errors";
+import type { ApiRequest, ApiResponse } from "@/types/api.types";
 
-async function fetchHelper(
-  url: string,
-  init: RequestInit,
-): Promise<Response | ApiError> {
+async function fetchHelper(url: string, init: RequestInit): Promise<Response> {
   try {
     return await fetch(url, init);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Unknown fetch error";
-    return httpErrors.CLIENT_RUNTIME_ERROR(`Fetch failed: ${msg}`);
+    throw Errors.CLIENT_RUNTIME_ERROR(`Fetch failed: ${msg}`);
   }
 }
 
 async function parseJsonHelper<T>(
   res: Response,
-): Promise<ApiSuccess<T> | ApiError> {
+): Promise<ApiResponse<true, T>> {
+  let apiResponse: ApiResponse<true, T> | ApiResponse<false>;
+
   try {
-    return (await res.json()) as ApiSuccess<T> | ApiError;
+    apiResponse = await res.json();
   } catch (error: unknown) {
     const msg =
       error instanceof Error ? error.message : "Unknown JSON parse error";
-    return httpErrors.CLIENT_RUNTIME_ERROR(`JSON parse failed: ${msg}`);
+    throw Errors.CLIENT_RUNTIME_ERROR(`JSON parse failed: ${msg}`);
   }
+
+  if (!apiResponse.ok) throw new ApiError(apiResponse);
+  return apiResponse;
 }
 
-export async function httpRequest<T>(
-  request: ApiRequest,
-): Promise<ApiResponse<T>> {
-  const { method, url, token, body } = request;
+export async function httpRequest<T = undefined>(
+  request: ApiRequest | ApiRequest<true, any>,
+): Promise<ApiResponse<true, T>> {
+  const { method, url } = request;
 
   const headers: HeadersInit = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
+  if ("token" in request && request.token) {
+    headers["Authorization"] = `Bearer ${request.token}`;
+  }
 
+  const body = "body" in request && request.body ? request.body : undefined;
   const hasBody = body !== undefined && method !== "GET";
   if (hasBody) headers["Content-Type"] = "application/json";
 
@@ -45,8 +45,8 @@ export async function httpRequest<T>(
     method,
     headers,
     ...(hasBody ? { body: JSON.stringify(body) } : {}),
+    credentials: "include",
   });
-  if (!(res instanceof Response)) return res;
 
   return await parseJsonHelper<T>(res);
 }

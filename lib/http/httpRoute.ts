@@ -1,29 +1,23 @@
+import { ApiError, Errors } from "@/lib/core/errors";
 import { httpResponse } from "@/lib/http/httpResponse";
-import { httpErrors } from "@/lib/http/httpErrors";
-import type { ApiError } from "@/types/api.types";
-
-function isApiError(err: unknown): err is ApiError {
-  return (
-    typeof err === "object" &&
-    err !== null &&
-    "ok" in err &&
-    "status" in err &&
-    "code" in err &&
-    "message" in err &&
-    (err as any).ok === false &&
-    typeof (err as any).status === "number" &&
-    typeof (err as any).code === "string" &&
-    typeof (err as any).message === "string"
-  );
-}
 
 export const httpRoute =
-  (handler: (req: Request) => Promise<Response>) => async (req: Request) => {
+  <P extends string = never>(
+    handler: (
+      req: Request,
+      options: { params: Record<P, string> },
+    ) => Promise<Response>,
+  ) =>
+  async (req: Request, options?: { params: Promise<Record<P, string>> }) => {
     try {
-      return await handler(req);
+      const resolvedParams = await options?.params;
+
+      return await handler(req, {
+        params: resolvedParams ?? ({} as Record<P, string>),
+      });
     } catch (error: unknown) {
-      return isApiError(error)
-        ? httpResponse(error)
-        : httpResponse(httpErrors.INTERNAL_SERVER_ERROR());
+      return error instanceof ApiError
+        ? httpResponse.error(error.response)
+        : httpResponse.error(Errors.INTERNAL_SERVER_ERROR().response);
     }
   };
