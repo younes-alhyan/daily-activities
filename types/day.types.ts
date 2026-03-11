@@ -9,7 +9,7 @@ export const activityTypes = [
 ] as const;
 export type ActivityType = (typeof activityTypes)[number];
 
-// Activity Interface
+// Activity Interfaces
 export interface ActivityInput {
   type: ActivityType;
   description: string;
@@ -22,24 +22,13 @@ export interface ActivityDTO extends ActivityInput {
   id: string;
 }
 
-// Activities Interface
-export interface ActivitiesDoc {
-  _id: Types.ObjectId;
-  activities: ActivityDoc[];
-}
-export interface ActivitiesDTO {
-  id: string;
-  activities: ActivityDTO[];
-}
-
-// User Activities Interface
-export interface UserActivitiesDoc {
+// Day Interfaces
+export interface DayDoc {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
-  userActivities: ActivitiesDoc[];
+  activities: ActivityDoc[];
 }
-export interface UserActivitiesDTO {
+export interface DayDTO {
   id: string;
-  userId: string;
-  userActivities: ActivitiesDTO[];
+  activities: ActivityDTO[];
 }

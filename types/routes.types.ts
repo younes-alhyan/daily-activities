@@ -1,10 +1,6 @@
 import type { ApiRequest, ApiResponse } from "@/types/api.types";
 import type { UserInput, UserDTO } from "@/types/user.types";
-import type {
-  ActivityInput,
-  ActivityDTO,
-  ActivitiesDTO,
-} from "@/types/user-activities.types";
+import type { ActivityInput, ActivityDTO, DayDTO } from "@/types/day.types";
 
 // Auth Routes
 type AuthRequestsRoutes = {
@@ -33,24 +29,18 @@ type UserResponsesRoutes = {
   delete: () => ApiResponse<true>;
 };
 
-// User Activities Routes
-type UserActivitiesRequestsRoutes = {
+// Day Routes
+type DayRequestsRoutes = {
   get: (token: string) => ApiRequest<true>;
-};
-type UserActivitiesResponsesRoutes = {
-  get: (data: ActivitiesDTO[]) => ApiResponse<true, ActivitiesDTO[]>;
-};
-
-// Activities Routes
-type ActivitiesRequestsRoutes = {
   add: (
     token: string,
     body: ActivityInput[],
   ) => ApiRequest<true, ActivityInput[]>;
-  delete: (token: string, activitiesId: string) => ApiRequest<true>;
+  delete: (token: string, dayId: string) => ApiRequest<true>;
 };
-type ActivitiesResponsesRoutes = {
-  add: (data: ActivitiesDTO) => ApiResponse<true, ActivitiesDTO>;
+type DayResponsesRoutes = {
+  get: (data: DayDTO[]) => ApiResponse<true, DayDTO[]>;
+  add: (data: DayDTO) => ApiResponse<true, DayDTO>;
   delete: () => ApiResponse<true>;
 };
 
@@ -58,24 +48,24 @@ type ActivitiesResponsesRoutes = {
 type ActivityRequestsRoutes = {
   add: (
     token: string,
-    activitiesId: string,
+    dayId: string,
     body: ActivityInput,
   ) => ApiRequest<true, ActivityInput>;
   update: (
     token: string,
-    activitiesId: string,
+    dayId: string,
     activityId: string,
     body: Partial<ActivityInput>,
   ) => ApiRequest<true, Partial<ActivityInput>>;
   reorder: (
     token: string,
-    activitiesId: string,
+    dayId: string,
     activityId: string,
     body: { newIndex: number },
   ) => ApiRequest<true, { newIndex: number }>;
   delete: (
     token: string,
-    activitiesId: string,
+    dayId: string,
     activityId: string,
   ) => ApiRequest<true>;
 };
@@ -90,14 +80,12 @@ type ActivityResponsesRoutes = {
 export type RequestsRoutes = {
   auth: AuthRequestsRoutes;
   user: UserRequestsRoutes;
-  userActivities: UserActivitiesRequestsRoutes;
-  activities: ActivitiesRequestsRoutes;
+  day: DayRequestsRoutes;
   activity: ActivityRequestsRoutes;
 };
 export type ResponseRoutes = {
   auth: AuthResponsesRoutes;
   user: UserResponsesRoutes;
-  userActivities: UserActivitiesResponsesRoutes;
-  activities: ActivitiesResponsesRoutes;
+  day: DayResponsesRoutes;
   activity: ActivityResponsesRoutes;
 };
