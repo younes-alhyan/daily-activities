@@ -2,7 +2,7 @@ import { Errors } from "@/lib/core/errors";
 import { cleanUser } from "@/lib/utils/cleanObject";
 import { toObjectId } from "@/lib/utils/toObjectId";
 import { UserService } from "@/server/services/user.service";
-import type { UserDTO, UserInput } from "@/types/user.types";
+import type { UserInput, UserDTO } from "@/types/user.types";
 
 const getUser = async (id: string): Promise<UserDTO> => {
   const doc = await UserService.get(toObjectId(id));

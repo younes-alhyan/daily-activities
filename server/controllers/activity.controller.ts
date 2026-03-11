@@ -2,12 +2,12 @@ import { Errors } from "@/lib/core/errors";
 import { toObjectId } from "@/lib/utils/toObjectId";
 import { cleanActivity } from "@/lib/utils/cleanObject";
 import { ActivityService } from "@/server/services/activity.service";
-import {
-  activityTypes,
-  type ActivityType,
-  type ActivityDTO,
+import { activityTypes } from "@/types/day.types";
+import type {
+  ActivityType,
   ActivityInput,
-} from "@/types/user-activities.types";
+  ActivityDTO,
+} from "@/types/day.types";
 
 const isActivityType = (value: unknown): value is ActivityType => {
   return (
@@ -17,7 +17,7 @@ const isActivityType = (value: unknown): value is ActivityType => {
 
 const addActivity = async (
   userId: string,
-  activitiesId: string,
+  dayId: string,
   type: unknown,
   description: unknown,
   state: unknown,
@@ -28,7 +28,7 @@ const addActivity = async (
 
   const doc = await ActivityService.add(
     toObjectId(userId, "userId"),
-    toObjectId(activitiesId, "activitiesId"),
+    toObjectId(dayId, "dayId"),
     {
       type,
       description: typeof description === "string" ? description : "",
@@ -41,7 +41,7 @@ const addActivity = async (
 
 const updateActivity = async (
   userId: string,
-  activitiesId: string,
+  dayId: string,
   activityId: string,
   type: unknown,
   description: unknown,
@@ -76,7 +76,7 @@ const updateActivity = async (
 
   const doc = await ActivityService.update(
     toObjectId(userId, "userId"),
-    toObjectId(activitiesId, "activitiesId"),
+    toObjectId(dayId, "dayId"),
     toObjectId(activityId, "activityId"),
     updateData,
   );
@@ -86,7 +86,7 @@ const updateActivity = async (
 
 const reorderActivity = async (
   userId: string,
-  activitiesId: string,
+  dayId: string,
   activityId: string,
   newIndex: unknown,
 ): Promise<void> => {
@@ -96,7 +96,7 @@ const reorderActivity = async (
 
   return ActivityService.reorder(
     toObjectId(userId, "userId"),
-    toObjectId(activitiesId, "activitiesId"),
+    toObjectId(dayId, "dayId"),
     toObjectId(activityId, "activityId"),
     newIndex,
   );
@@ -104,12 +104,12 @@ const reorderActivity = async (
 
 const deleteActivity = (
   userId: string,
-  activitiesId: string,
+  dayId: string,
   activityId: string,
 ): Promise<void> =>
   ActivityService.delete(
     toObjectId(userId, "userId"),
-    toObjectId(activitiesId, "activitiesId"),
+    toObjectId(dayId, "dayId"),
     toObjectId(activityId, "activityId"),
   );
 

@@ -1,11 +1,8 @@
 import { Errors } from "@/lib/core/errors";
 import { toObjectId } from "@/lib/utils/toObjectId";
-import { cleanActivities } from "@/lib/utils/cleanObject";
-import { ActivitiesService } from "@/server/services/activities.service";
-import type {
-  ActivityInput,
-  ActivitiesDTO,
-} from "@/types/user-activities.types";
+import { cleanDay } from "@/lib/utils/cleanObject";
+import { DayService } from "@/server/services/day.service";
+import type { ActivityInput, DayDTO } from "@/types/day.types";
 
 const isActivityInput = (obj: any): obj is ActivityInput => {
   return (
@@ -17,10 +14,12 @@ const isActivityInput = (obj: any): obj is ActivityInput => {
   );
 };
 
-const addActivities = async (
-  userId: string,
-  activities: unknown,
-): Promise<ActivitiesDTO> => {
+const getDays = async (userId: string): Promise<DayDTO[]> => {
+  const doc = await DayService.get(toObjectId(userId, "userId"));
+  return doc.map(cleanDay);
+};
+
+const addDay = async (userId: string, activities: unknown): Promise<DayDTO> => {
   let activitiesList: ActivityInput[] = [];
 
   if (activities == null) {
@@ -33,23 +32,18 @@ const addActivities = async (
     activitiesList = activities;
   }
 
-  const doc = await ActivitiesService.add(
+  const doc = await DayService.add(
     toObjectId(userId, "userId"),
     activitiesList,
   );
-  return cleanActivities(doc);
+  return cleanDay(doc);
 };
 
-const deleteActivities = (
-  userId: string,
-  activitiesId: string,
-): Promise<void> =>
-  ActivitiesService.delete(
-    toObjectId(userId, "userId"),
-    toObjectId(activitiesId, "activitiesId"),
-  );
+const deleteDay = (userId: string, dayId: string): Promise<void> =>
+  DayService.delete(toObjectId(userId, "userId"), toObjectId(dayId, "dayId"));
 
-export const ActivitiesController = {
-  add: addActivities,
-  delete: deleteActivities,
+export const DayController = {
+  get: getDays,
+  add: addDay,
+  delete: deleteDay,
 };
