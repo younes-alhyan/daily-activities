@@ -1,11 +1,6 @@
 import bcrypt from "bcryptjs";
-import {
-  Schema,
-  model,
-  models,
-  type Model,
-  type HydratedDocument,
-} from "mongoose";
+import { Schema, model, models } from "mongoose";
+import type { Model, HydratedDocument } from "mongoose";
 import type { UserDoc } from "@/types/user.types";
 
 type UserMethods = {
