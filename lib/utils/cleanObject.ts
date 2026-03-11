@@ -2,9 +2,9 @@ import type { UserDoc, UserDTO } from "@/types/user.types";
 import type {
   ActivityDoc,
   ActivityDTO,
-  ActivitiesDoc,
-  ActivitiesDTO,
-} from "@/types/user-activities.types";
+  DayDoc,
+  DayDTO,
+} from "@/types/day.types";
 
 export const cleanUser = (user: UserDoc): UserDTO => ({
   id: user._id.toString(),
@@ -18,7 +18,7 @@ export const cleanActivity = (activity: ActivityDoc): ActivityDTO => ({
   state: activity.state,
 });
 
-export const cleanActivities = (activities: ActivitiesDoc): ActivitiesDTO => ({
-  id: activities._id.toString(),
-  activities: activities.activities.map(cleanActivity),
+export const cleanDay = (day: DayDoc): DayDTO => ({
+  id: day._id.toString(),
+  activities: day.activities.map(cleanActivity),
 });
