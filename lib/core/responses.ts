@@ -39,14 +39,11 @@ export const Responses: ResponseRoutes = {
     }),
   },
 
-  userActivities: {
+  day: {
     get: (data) => ({
       ...successApiResponse(200, "User activities retrieved successfully"),
       data,
     }),
-  },
-
-  activities: {
     add: (data) => ({
       ...successApiResponse(201, "Activities added successfully"),
       data,

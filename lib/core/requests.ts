@@ -17,6 +17,7 @@ export const Requests: RequestsRoutes = {
       url: "/api/auth/refresh",
     }),
   },
+
   user: {
     get: (token) => ({
       method: "GET",
@@ -35,48 +36,48 @@ export const Requests: RequestsRoutes = {
       token,
     }),
   },
-  userActivities: {
+
+  day: {
     get: (token) => ({
       method: "GET",
-      url: "/api/user-activities",
+      url: "/api/days",
       token,
     }),
-  },
-  activities: {
     add: (token, body) => ({
       method: "POST",
-      url: "/api/activities",
+      url: "/api/days",
       token,
       body,
     }),
-    delete: (token, activitiesId) => ({
+    delete: (token, dayId) => ({
       method: "DELETE",
-      url: `/api/activities/${activitiesId}`,
+      url: `/api/days/${dayId}`,
       token,
     }),
   },
+
   activity: {
-    add: (token, activitiesId, body) => ({
+    add: (token, dayId, body) => ({
       method: "POST",
-      url: `/api/activities/${activitiesId}/activity`,
+      url: `/api/days/${dayId}/activities`,
       token,
       body,
     }),
-    update: (token, activitiesId, activityId, body) => ({
+    update: (token, dayId, activityId, body) => ({
       method: "PATCH",
-      url: `/api/activities/${activitiesId}/activity/${activityId}`,
+      url: `/api/days/${dayId}/activities/${activityId}`,
       token,
       body,
     }),
-    reorder: (token, activitiesId, activityId, body) => ({
+    reorder: (token, dayId, activityId, body) => ({
       method: "PATCH",
-      url: `/api/activities/${activitiesId}/activity/${activityId}/reorder`,
+      url: `/api/days/${dayId}/activities/${activityId}/reorder`,
       token,
       body,
     }),
-    delete: (token, activitiesId, activityId) => ({
+    delete: (token, dayId, activityId) => ({
       method: "DELETE",
-      url: `/api/activities/${activitiesId}/activity/${activityId}`,
+      url: `/api/days/${dayId}/activities/${activityId}`,
       token,
     }),
   },
