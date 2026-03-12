@@ -9,6 +9,7 @@
   --border: rgba(255, 255, 255, 0.03);
   --accent-green: #22c55e;
   --accent-blue: #3b82f6;
+  --accent-light-blue: #38bdf8;
   --accent-red: #ef4444;
   --accent-purple: #a855f7;
   --accent-yellow: #f59e0b;
@@ -23,6 +24,7 @@
   --color-border: var(--border);
   --color-accent-green: var(--accent-green);
   --color-accent-blue: var(--accent-blue);
+  --color-accent-light-blue: var(--accent-light-blue);
   --color-accent-red: var(--accent-red);
   --color-accent-purple: var(--accent-purple);
   --color-accent-yellow: var(--accent-yellow);
