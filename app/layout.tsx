@@ -1,4 +1,4 @@
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "@/client/contexts/AuthContext";
 import type { Metadata } from "next";
 import "./globals.css";
 
