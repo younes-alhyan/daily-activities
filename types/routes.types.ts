@@ -4,24 +4,24 @@ import type { ActivityInput, ActivityDTO, DayDTO } from "@/types/day.types";
 
 // Auth Routes
 type AuthRequestsRoutes = {
-  signup: (body: UserInput) => ApiRequest<false, UserInput>;
-  login: (body: UserInput) => ApiRequest<false, UserInput>;
+  signup: (args: { body: UserInput }) => ApiRequest<false, UserInput>;
+  login: (args: { body: UserInput }) => ApiRequest<false, UserInput>;
   refresh: () => ApiRequest;
 };
 type AuthResponsesRoutes = {
   signup: () => ApiResponse<true>;
-  login: (data: { token: string }) => ApiResponse<true, { token: string }>;
-  refresh: (data: { token: string }) => ApiResponse<true, { token: string }>;
+  login: (data: { accessToken: string }) => ApiResponse<true, { accessToken: string }>;
+  refresh: (data: { accessToken: string }) => ApiResponse<true, { accessToken: string }>;
 };
 
 // User Routes
 type UserRequestsRoutes = {
-  get: (token: string) => ApiRequest<true>;
-  update: (
-    token: string,
-    body: Partial<UserInput>,
-  ) => ApiRequest<true, Partial<UserInput>>;
-  delete: (token: string) => ApiRequest<true>;
+  get: (args: { accessToken: string }) => ApiRequest<true>;
+  update: (args: {
+    accessToken: string;
+    body: Partial<UserInput>;
+  }) => ApiRequest<true, Partial<UserInput>>;
+  delete: (args: { accessToken: string }) => ApiRequest<true>;
 };
 type UserResponsesRoutes = {
   get: (data: UserDTO) => ApiResponse<true, UserDTO>;
@@ -31,12 +31,12 @@ type UserResponsesRoutes = {
 
 // Day Routes
 type DayRequestsRoutes = {
-  get: (token: string) => ApiRequest<true>;
-  add: (
-    token: string,
-    body: ActivityInput[],
-  ) => ApiRequest<true, ActivityInput[]>;
-  delete: (token: string, dayId: string) => ApiRequest<true>;
+  get: (args: { accessToken: string }) => ApiRequest<true>;
+  add: (args: {
+    accessToken: string;
+    body: ActivityInput[];
+  }) => ApiRequest<true, ActivityInput[]>;
+  delete: (args: { accessToken: string; dayId: string }) => ApiRequest<true>;
 };
 type DayResponsesRoutes = {
   get: (data: DayDTO[]) => ApiResponse<true, DayDTO[]>;
@@ -46,28 +46,28 @@ type DayResponsesRoutes = {
 
 // Activity Routes
 type ActivityRequestsRoutes = {
-  add: (
-    token: string,
-    dayId: string,
-    body: ActivityInput,
-  ) => ApiRequest<true, ActivityInput>;
-  update: (
-    token: string,
-    dayId: string,
-    activityId: string,
-    body: Partial<ActivityInput>,
-  ) => ApiRequest<true, Partial<ActivityInput>>;
-  reorder: (
-    token: string,
-    dayId: string,
-    activityId: string,
-    body: { newIndex: number },
-  ) => ApiRequest<true, { newIndex: number }>;
-  delete: (
-    token: string,
-    dayId: string,
-    activityId: string,
-  ) => ApiRequest<true>;
+  add: (args: {
+    accessToken: string;
+    dayId: string;
+    body: ActivityInput;
+  }) => ApiRequest<true, ActivityInput>;
+  update: (args: {
+    accessToken: string;
+    dayId: string;
+    activityId: string;
+    body: Partial<ActivityInput>;
+  }) => ApiRequest<true, Partial<ActivityInput>>;
+  reorder: (args: {
+    accessToken: string;
+    dayId: string;
+    activityId: string;
+    body: { newIndex: number };
+  }) => ApiRequest<true, { newIndex: number }>;
+  delete: (args: {
+    accessToken: string;
+    dayId: string;
+    activityId: string;
+  }) => ApiRequest<true>;
 };
 type ActivityResponsesRoutes = {
   add: (data: ActivityDTO) => ApiResponse<true, ActivityDTO>;
