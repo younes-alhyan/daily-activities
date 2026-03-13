@@ -33,8 +33,8 @@ export async function httpRequest<T = undefined>(
   const { method, url } = request;
 
   const headers: HeadersInit = {};
-  if ("token" in request && request.token) {
-    headers["Authorization"] = `Bearer ${request.token}`;
+  if ("accessToken" in request && request.accessToken) {
+    headers["Authorization"] = `Bearer ${request.accessToken}`;
   }
 
   const body = "body" in request && request.body ? request.body : undefined;
