@@ -2,12 +2,12 @@ import type { RequestsRoutes } from "@/types/routes.types";
 
 export const Requests: RequestsRoutes = {
   auth: {
-    signup: (body) => ({
+    signup: ({ body }) => ({
       method: "POST",
       url: "/api/auth/signup",
       body,
     }),
-    login: (body) => ({
+    login: ({ body }) => ({
       method: "POST",
       url: "/api/auth/login",
       body,
@@ -19,66 +19,66 @@ export const Requests: RequestsRoutes = {
   },
 
   user: {
-    get: (token) => ({
+    get: ({ accessToken }) => ({
       method: "GET",
       url: "/api/user",
-      token,
+      accessToken,
     }),
-    update: (token, body) => ({
+    update: ({ accessToken, body }) => ({
       method: "PATCH",
       url: "/api/user",
-      token,
+      accessToken,
       body,
     }),
-    delete: (token) => ({
+    delete: ({ accessToken }) => ({
       method: "DELETE",
       url: "/api/user",
-      token,
+      accessToken,
     }),
   },
 
   day: {
-    get: (token) => ({
+    get: ({ accessToken }) => ({
       method: "GET",
       url: "/api/days",
-      token,
+      accessToken,
     }),
-    add: (token, body) => ({
+    add: ({ accessToken, body }) => ({
       method: "POST",
       url: "/api/days",
-      token,
+      accessToken,
       body,
     }),
-    delete: (token, dayId) => ({
+    delete: ({ accessToken, dayId }) => ({
       method: "DELETE",
       url: `/api/days/${dayId}`,
-      token,
+      accessToken,
     }),
   },
 
   activity: {
-    add: (token, dayId, body) => ({
+    add: ({ accessToken, dayId, body }) => ({
       method: "POST",
       url: `/api/days/${dayId}/activities`,
-      token,
+      accessToken,
       body,
     }),
-    update: (token, dayId, activityId, body) => ({
+    update: ({ accessToken, dayId, activityId, body }) => ({
       method: "PATCH",
       url: `/api/days/${dayId}/activities/${activityId}`,
-      token,
+      accessToken,
       body,
     }),
-    reorder: (token, dayId, activityId, body) => ({
+    reorder: ({ accessToken, dayId, activityId, body }) => ({
       method: "PATCH",
       url: `/api/days/${dayId}/activities/${activityId}/reorder`,
-      token,
+      accessToken,
       body,
     }),
-    delete: (token, dayId, activityId) => ({
+    delete: ({ accessToken, dayId, activityId }) => ({
       method: "DELETE",
       url: `/api/days/${dayId}/activities/${activityId}`,
-      token,
+      accessToken,
     }),
   },
 };
