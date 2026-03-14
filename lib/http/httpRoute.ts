@@ -1,5 +1,6 @@
-import { ApiError, Errors } from "@/lib/core/errors";
+import { Errors } from "@/lib/core/errors";
 import { httpResponse } from "@/lib/http/httpResponse";
+import { ApiError } from "@/types/api.types";
 
 export const httpRoute =
   <P extends string = never>(
