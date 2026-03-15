@@ -1,35 +1,36 @@
-"use client"
+"use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useApi } from "@/client/hooks/useApi";
 import { httpRequest } from "@/lib/http/httpRequest";
-import { ApiError, Errors } from "@/lib/core/errors";
+import { Errors } from "@/lib/core/errors";
 import { Requests } from "@/lib/core/requests";
-import { LoadingPageComponent } from "@/client/components/LoadingComponent";
+import { LoadingPage } from "@/app/LoadingPage";
+import { ApiError } from "@/types/api.types";
+import type { ApiHooksRoutes } from "@/types/apiHooks.types";
 import type { ApiRequest, ApiResponse } from "@/types/api.types";
-import type { UserInput } from "@/types/user.types";
 
 type AuthContextType = {
-  token: string;
-  signup: (user: UserInput) => Promise<void>;
-  login: (user: UserInput) => Promise<void>;
-  logout: () => void;
+  accessToken: string;
+  signup: ApiHooksRoutes["auth"]["signup"]["Hook"];
+  login: ApiHooksRoutes["auth"]["login"]["Hook"];
   requestWithRefresh: <T>(
     request: ApiRequest<true, any>,
   ) => Promise<ApiResponse<true, T>>;
+  logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const [token, setToken] = useState<string>("");
+  const [accessToken, setAccessToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token") || "";
-    setToken(storedToken);
+    const storedToken = localStorage.getItem("accessToken") || "";
+    setAccessToken(storedToken);
 
     const isAuthPage = pathname.startsWith("/auth");
 
@@ -46,32 +47,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, [pathname, router]);
 
-  const signup = async (user: UserInput) => {
-    await httpRequest(Requests.auth.signup(user));
-    await login(user);
-  };
+  const signup = useApi<ApiHooksRoutes["auth"]["signup"]["Def"]>({
+    request: Requests.auth.signup,
+    requestHandler: httpRequest,
+  });
 
-  const login = async (user: UserInput) => {
-    const res = await httpRequest<{ token: string }>(Requests.auth.login(user));
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
-    router.replace("/");
-  };
+  const login = useApi<ApiHooksRoutes["auth"]["login"]["Def"]>({
+    request: Requests.auth.login,
+    requestHandler: httpRequest,
+    postCallBack: (data) => {
+      localStorage.setItem("accessToken", data.accessToken);
+      setAccessToken(data.accessToken);
+      router.replace("/");
+    },
+  });
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-    router.replace("/auth");
-  };
+  const refresh = useApi<ApiHooksRoutes["auth"]["refresh"]["Def"]>({
+    request: Requests.auth.refresh,
+    requestHandler: httpRequest,
+    postCallBack: (data) => {
+      localStorage.setItem("accessToken", data.accessToken);
+      setAccessToken(data.accessToken);
+    },
+  });
 
-  const refresh = async (): Promise<string> => {
-    const res = await httpRequest<{ token: string }>(Requests.auth.refresh());
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
-    return res.data.token;
-  };
-
-  async function requestWithRefresh<T = undefined>(
+  async function requestWithRefresh<T = any>(
     request: ApiRequest<true, any>,
   ): Promise<ApiResponse<true, T>> {
     try {
@@ -79,24 +79,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: unknown) {
       if (!(error instanceof ApiError)) throw Errors.CLIENT_RUNTIME_ERROR();
       if (error.response.status !== 401) throw error;
+
       try {
-        const newToken = await refresh();
-        return httpRequest<T>({
+        const { error, call } = refresh;
+        const res = await call();
+
+        if (!res) throw error ?? Errors.CLIENT_RUNTIME_ERROR();
+
+        return await httpRequest<T>({
           ...request,
-          token: newToken,
+          accessToken: res.data.accessToken,
         });
-      } catch (error: unknown) {
+      } catch (err: unknown) {
         logout();
-        throw error;
+        throw err;
       }
     }
   }
 
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    setAccessToken("");
+    router.replace("/auth");
+  };
+
   return (
     <AuthContext.Provider
-      value={{ token, signup, login, logout, requestWithRefresh }}
+      value={{ accessToken, signup, login, requestWithRefresh, logout }}
     >
-      {isLoading ? <LoadingPageComponent /> : children}
+      {isLoading ? <LoadingPage /> : children}
     </AuthContext.Provider>
   );
 }
