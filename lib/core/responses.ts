@@ -1,5 +1,5 @@
 import type { ApiResponse } from "@/types/api.types";
-import type { ResponseRoutes } from "@/types/routes.types";
+import type { ResponsesRoutes } from "@/types/responses.types";
 
 const successApiResponse = (
   status: number,
@@ -10,7 +10,7 @@ const successApiResponse = (
   message,
 });
 
-export const Responses: ResponseRoutes = {
+export const Responses: ResponsesRoutes = {
   auth: {
     signup: () => ({
       ...successApiResponse(201, "Signup successful"),
@@ -39,34 +39,40 @@ export const Responses: ResponseRoutes = {
     }),
   },
 
-  day: {
+  days: {
     get: (data) => ({
       ...successApiResponse(200, "User activities retrieved successfully"),
       data,
     }),
-    add: (data) => ({
-      ...successApiResponse(201, "Activities added successfully"),
-      data,
-    }),
-    delete: () => ({
-      ...successApiResponse(200, "Activities deleted successfully"),
-    }),
+    day: {
+      add: (data) => ({
+        ...successApiResponse(201, "Activities added successfully"),
+        data,
+      }),
+
+      delete: () => ({
+        ...successApiResponse(200, "Activities deleted successfully"),
+      }),
+    },
   },
 
-  activity: {
+  activities: {
     add: (data) => ({
       ...successApiResponse(201, "Activity added successfully"),
       data,
     }),
-    update: (data) => ({
-      ...successApiResponse(200, "Activity updated successfully"),
-      data,
-    }),
-    reorder: () => ({
-      ...successApiResponse(200, "Activity reordered successfully"),
-    }),
-    delete: () => ({
-      ...successApiResponse(200, "Activity deleted successfully"),
-    }),
+
+    activity: {
+      update: (data) => ({
+        ...successApiResponse(200, "Activity updated successfully"),
+        data,
+      }),
+      reorder: () => ({
+        ...successApiResponse(200, "Activity reordered successfully"),
+      }),
+      delete: () => ({
+        ...successApiResponse(200, "Activity deleted successfully"),
+      }),
+    },
   },
 };

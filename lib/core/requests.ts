@@ -1,4 +1,4 @@
-import type { RequestsRoutes } from "@/types/routes.types";
+import { RequestsRoutes } from "@/types/requests.types";
 
 export const Requests: RequestsRoutes = {
   auth: {
@@ -37,48 +37,54 @@ export const Requests: RequestsRoutes = {
     }),
   },
 
-  day: {
+  days: {
     get: ({ accessToken }) => ({
       method: "GET",
       url: "/api/days",
       accessToken,
     }),
-    add: ({ accessToken, body }) => ({
-      method: "POST",
-      url: "/api/days",
-      accessToken,
-      body,
-    }),
-    delete: ({ accessToken, dayId }) => ({
-      method: "DELETE",
-      url: `/api/days/${dayId}`,
-      accessToken,
-    }),
+    day: {
+      add: ({ accessToken, body }) => ({
+        method: "POST",
+        url: "/api/days",
+        accessToken,
+        body,
+      }),
+
+      delete: ({ accessToken, dayId }) => ({
+        method: "DELETE",
+        url: `/api/days/${dayId}`,
+        accessToken,
+      }),
+    },
   },
 
-  activity: {
+  activities: {
     add: ({ accessToken, dayId, body }) => ({
       method: "POST",
       url: `/api/days/${dayId}/activities`,
       accessToken,
       body,
     }),
-    update: ({ accessToken, dayId, activityId, body }) => ({
-      method: "PATCH",
-      url: `/api/days/${dayId}/activities/${activityId}`,
-      accessToken,
-      body,
-    }),
-    reorder: ({ accessToken, dayId, activityId, body }) => ({
-      method: "PATCH",
-      url: `/api/days/${dayId}/activities/${activityId}/reorder`,
-      accessToken,
-      body,
-    }),
-    delete: ({ accessToken, dayId, activityId }) => ({
-      method: "DELETE",
-      url: `/api/days/${dayId}/activities/${activityId}`,
-      accessToken,
-    }),
+
+    activity: {
+      update: ({ accessToken, dayId, activityId, body }) => ({
+        method: "PATCH",
+        url: `/api/days/${dayId}/activities/${activityId}`,
+        accessToken,
+        body,
+      }),
+      reorder: ({ accessToken, dayId, activityId, body }) => ({
+        method: "PATCH",
+        url: `/api/days/${dayId}/activities/${activityId}/reorder`,
+        accessToken,
+        body,
+      }),
+      delete: ({ accessToken, dayId, activityId }) => ({
+        method: "DELETE",
+        url: `/api/days/${dayId}/activities/${activityId}`,
+        accessToken,
+      }),
+    },
   },
 };
