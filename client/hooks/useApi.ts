@@ -1,51 +1,68 @@
 "use client";
 import { useState } from "react";
-import { ApiError, Errors } from "@/lib/core/errors";
-import type { ApiRequest, ApiResponse } from "@/types/api.types";
+import { Errors } from "@/lib/core/errors";
+import { ApiError } from "@/types/api.types";
+import type {
+  ApiRequest,
+  ApiResponse,
+  ApiHookDef,
+  ApiHook,
+} from "@/types/api.types";
 
-export interface ApiHook<
-  InputArgsT extends Record<string, any> = {},
-  DataT = undefined,
-> {
-  isLoading: boolean;
-  error: ApiError | null;
-  clearError: () => void;
-  call: (
-    ...args: keyof InputArgsT extends never ? [] : [input: InputArgsT]
-  ) => Promise<ApiResponse<true, DataT> | undefined>;
-}
+type HookArgs<T extends ApiHookDef> = T["HookArgsT"] extends null
+  ? {}
+  : T["HookArgsT"];
+type InputArgs<T extends ApiHookDef> = T["InputArgsT"] extends null
+  ? {}
+  : T["InputArgsT"];
+type RequestArgs<T extends ApiHookDef> = HookArgs<T> & InputArgs<T>;
 
-export const useApi = <
-  TokenT extends boolean = false,
-  HookArgsT extends Record<string, any> = {},
-  InputArgsT extends Record<string, any> = {},
-  DataT = undefined,
->(
-  hookArgs: HookArgsT,
-  request: (args: HookArgsT & InputArgsT) => ApiRequest<TokenT, any>,
-  requestHandler: <T = DataT>(
-    request: ApiRequest<TokenT, any>,
-  ) => Promise<ApiResponse<true, T>>,
-  postCallBack?: (data: DataT, args: HookArgsT & InputArgsT) => void,
-  preCallBack?: (args: HookArgsT & InputArgsT) => void,
-): ApiHook<InputArgsT, DataT> => {
+type UseApiProps<
+  T extends ApiHookDef,
+  PreResult = void,
+> = (keyof HookArgs<T> extends never ? {} : { hookArgs: HookArgs<T> }) & {
+  request: keyof RequestArgs<T> extends never
+    ? () => ApiRequest<T["TokenT"], any>
+    : (args: RequestArgs<T>) => ApiRequest<T["TokenT"], any>;
+
+  requestHandler: <DataT = T["DataT"]>(
+    req: ApiRequest<T["TokenT"], any>,
+  ) => Promise<ApiResponse<true, DataT>>;
+
+  preCallBack?: (args: RequestArgs<T>) => PreResult;
+
+  postCallBack?: (data: T["DataT"], args: RequestArgs<T> & PreResult) => void;
+};
+
+export const useApi = <T extends ApiHookDef, PreResultT = void>(
+  props: UseApiProps<T, PreResultT>,
+): ApiHook<T>["Hook"] => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const clearError = () => setError(null);
+  const { request, requestHandler, preCallBack, postCallBack } = props;
 
-  const call = async (
-    ...args: keyof InputArgsT extends never ? [] : [input: InputArgsT]
+  const call: T["InputArgsT"] extends null
+    ? () => Promise<ApiResponse<true, T["DataT"]> | undefined>
+    : (
+        input: T["InputArgsT"],
+      ) => Promise<ApiResponse<true, T["DataT"]> | undefined> = async (
+    input?: T["InputArgsT"],
   ) => {
-    const allArgs = { ...hookArgs, ...(args[0] as InputArgsT) };
-    if (preCallBack) preCallBack(allArgs);
+    const allArgs: RequestArgs<T> = {
+      ...("hookArgs" in props ? props.hookArgs : {}),
+      ...(input ?? ({} as InputArgs<T>)),
+    };
+
+    let preCallBackResult = preCallBack?.(allArgs) as PreResultT;
     setIsLoading(true);
     clearError();
 
     try {
-      const res = await requestHandler<DataT>(request(allArgs));
+      const res = await requestHandler(request(allArgs));
 
       if ("data" in res && postCallBack) {
-        postCallBack(res.data, allArgs);
+        postCallBack(res.data, { ...allArgs, ...preCallBackResult });
       }
 
       return res;
