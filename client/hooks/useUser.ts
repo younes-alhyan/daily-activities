@@ -1,27 +1,35 @@
-"use client"
+"use client";
+import { useState } from "react";
 import { useAuth } from "@/client/contexts/AuthContext";
+import { useApi } from "@/client/hooks/useApi";
 import { Requests } from "@/lib/core/requests";
-import type { UserInput, UserDTO } from "@/types/user.types";
+import type { ApiHooksRoutes } from "@/types/apiHooks.types";
+import type { UserDTO } from "@/types/user.types";
 
 export function useUser() {
-  const { token, logout, requestWithRefresh } = useAuth();
+  const [user, setUser] = useState<UserDTO>({ id: "", username: "" });
+  const { accessToken, requestWithRefresh, logout } = useAuth();
 
-  const getUser = async () => {
-    const res = await requestWithRefresh<UserDTO>(Requests.user.get(token));
-    return res.data;
-  };
+  const getUser = useApi<ApiHooksRoutes["user"]["get"]["Def"]>({
+    hookArgs: { accessToken },
+    request: Requests.user.get,
+    requestHandler: requestWithRefresh,
+    postCallBack: (data) => setUser(data),
+  });
 
-  const updateUser = async (body: Partial<UserInput>) => {
-    const res = await requestWithRefresh<UserDTO>(
-      Requests.user.update(token, body),
-    );
-    return res.data;
-  };
+  const updateUser = useApi<ApiHooksRoutes["user"]["update"]["Def"]>({
+    hookArgs: { accessToken },
+    request: Requests.user.update,
+    requestHandler: requestWithRefresh,
+    preCallBack: (args) => setUser((prev) => ({ ...prev, ...args.body })),
+  });
 
-  const deleteUser = async () => {
-    await requestWithRefresh(Requests.user.delete(token));
-    logout();
-  };
+  const deleteUser = useApi<ApiHooksRoutes["user"]["delete"]["Def"]>({
+    hookArgs: { accessToken },
+    request: Requests.user.delete,
+    requestHandler: requestWithRefresh,
+    preCallBack: logout,
+  });
 
-  return { getUser, updateUser, deleteUser };
+  return { user, getUser, updateUser, deleteUser };
 }

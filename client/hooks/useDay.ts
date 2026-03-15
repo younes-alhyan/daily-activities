@@ -1,26 +1,75 @@
-"use client"
+"use client";
 import { useAuth } from "@/client/contexts/AuthContext";
+import { useApi } from "@/client/hooks/useApi";
 import { Requests } from "@/lib/core/requests";
-import type { ActivityInput, DayDTO } from "@/types/day.types";
+import type { SetStateAction } from "react";
+import type { ApiHooksRoutes } from "@/types/apiHooks.types";
+import type { ActivityDTO, DayDTO } from "@/types/day.types";
 
-export const useDay = () => {
-  const { token, requestWithRefresh } = useAuth();
+interface UseDayProps {
+  day: DayDTO;
+  setDays: React.Dispatch<SetStateAction<DayDTO[] | undefined>>;
+}
 
-  const getDays = async () => {
-    const res = await requestWithRefresh<DayDTO[]>(Requests.day.get(token));
-    return res.data;
+export const useDay = ({ day, setDays }: UseDayProps) => {
+  const { accessToken, requestWithRefresh } = useAuth();
+  const { id: dayId, activities } = day;
+
+  const onAddDay = (day: DayDTO) => {
+    setDays((prev) => [...(prev ?? []), day]);
+  };
+  const onUpdateDay = (dayId: string, day: DayDTO) => {
+    setDays((prev) => prev?.map((v) => (v.id === dayId ? day : v)));
+  };
+  const onDeleteDay = () => {
+    setDays((prev) => prev?.filter((v) => v.id !== dayId));
   };
 
-  const addDay = async (activities: ActivityInput[]) => {
-    const res = await requestWithRefresh<DayDTO>(
-      Requests.day.add(token, activities),
+  const setActivities = (
+    updater: (activities: ActivityDTO[]) => ActivityDTO[],
+  ) => {
+    setDays((prev) =>
+      prev?.map((v) =>
+        v.id === day.id ? { ...v, activities: updater(v.activities) } : v,
+      ),
     );
-    return res.data;
   };
 
-  const deleteDay = async (dayId: string) => {
-    await requestWithRefresh(Requests.day.delete(token, dayId));
-  };
+  const addDay = useApi<
+    ApiHooksRoutes["days"]["day"]["add"]["Def"],
+    { tempId: string }
+  >({
+    hookArgs: {
+      accessToken,
+      body: activities.map((v) => ({
+        ...v,
+        state: false,
+        description: "",
+      })),
+    },
+    request: Requests.days.day.add,
+    requestHandler: requestWithRefresh,
+    preCallBack: (args) => {
+      const tempId = crypto.randomUUID();
+      onAddDay({
+        id: tempId,
+        activities: args.body.map((v, i) => ({ ...v, id: `ACTIVITY_ID${i}` })),
+      });
+      return { tempId };
+    },
+    postCallBack: (data, args) => onUpdateDay(args.tempId, data),
+  });
 
-  return { getDays, addDay, deleteDay };
+  const deleteDay = useApi<ApiHooksRoutes["days"]["day"]["delete"]["Def"]>({
+    hookArgs: { accessToken, dayId },
+    request: Requests.days.day.delete,
+    requestHandler: requestWithRefresh,
+    preCallBack: onDeleteDay,
+  });
+
+  return {
+    addDay,
+    deleteDay,
+    setActivities,
+  };
 };

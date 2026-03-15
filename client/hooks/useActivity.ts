@@ -1,44 +1,88 @@
-"use client"
 import { useAuth } from "@/client/contexts/AuthContext";
+import { useApi } from "@/client/hooks/useApi";
 import { Requests } from "@/lib/core/requests";
-import type { ActivityInput, ActivityDTO } from "@/types/day.types";
+import type { ApiHooksRoutes } from "@/types/apiHooks.types";
+import type { ActivityDTO } from "@/types/day.types";
 
-export const useActivity = () => {
-  const { token, requestWithRefresh } = useAuth();
+export const useActivity = (
+  dayId: string,
+  setActivities: (
+    updater: (activities: ActivityDTO[]) => ActivityDTO[],
+  ) => void,
+) => {
+  const { accessToken, requestWithRefresh } = useAuth();
 
-  const addActivity = async (dayId: string, activity: ActivityInput) => {
-    const res = await requestWithRefresh<ActivityDTO>(
-      Requests.activity.add(token, dayId, activity),
-    );
-    return res.data;
+  const onAddActivity = (activity: ActivityDTO) => {
+    setActivities((prev) => [...prev, activity]);
   };
-
-  const updateActivity = async (
-    dayId: string,
-    activityId: string,
-    activity: Partial<ActivityInput>,
-  ) => {
-    const res = await requestWithRefresh<ActivityDTO>(
-      Requests.activity.update(token, dayId, activityId, activity),
-    );
-    return res.data;
-  };
-
-  const reorderActivity = async (
-    dayId: string,
-    activityId: string,
-    newIndex: number,
-  ) => {
-    await requestWithRefresh(
-      Requests.activity.reorder(token, dayId, activityId, { newIndex }),
+  const onUpdateActivity = (activityId: string, activity: ActivityDTO) => {
+    setActivities((prev) =>
+      prev.map((v) => (v.id === activityId ? activity : v)),
     );
   };
-
-  const deleteActivity = async (dayId: string, activityId: string) => {
-    await requestWithRefresh(
-      Requests.activity.delete(token, dayId, activityId),
-    );
+  const onDeleteActivity = (activityId: string) => {
+    setActivities((prev) => prev.filter((v) => v.id !== activityId));
   };
 
-  return { addActivity, updateActivity, reorderActivity, deleteActivity };
+  const addActivity = useApi<
+    ApiHooksRoutes["activities"]["add"]["Def"],
+    { tempId: string }
+  >({
+    hookArgs: {
+      accessToken,
+      dayId,
+      body: { type: "watching", state: false, description: "" },
+    },
+    request: Requests.activities.add,
+    requestHandler: requestWithRefresh,
+    preCallBack: (args) => {
+      const tempId = crypto.randomUUID();
+      onAddActivity({
+        id: tempId,
+        ...args.body,
+      });
+      return { tempId };
+    },
+    postCallBack: (data, args) => {
+      onUpdateActivity(args.tempId, data);
+    },
+  });
+
+  const updateActivity = useApi<
+    ApiHooksRoutes["activities"]["activity"]["update"]["Def"]
+  >({
+    hookArgs: { accessToken, dayId },
+    request: Requests.activities.activity.update,
+    requestHandler: requestWithRefresh,
+    preCallBack: (args) => {
+      setActivities((prev) =>
+        prev.map((v) =>
+          v.id === args.activityId ? { ...v, ...args.body } : v,
+        ),
+      );
+    },
+  });
+
+  const reorderActivity = useApi<
+    ApiHooksRoutes["activities"]["activity"]["reorder"]["Def"]
+  >({
+    hookArgs: { accessToken, dayId },
+    request: Requests.activities.activity.reorder,
+    requestHandler: requestWithRefresh,
+  });
+  const deleteActivity = useApi<
+    ApiHooksRoutes["activities"]["activity"]["delete"]["Def"]
+  >({
+    hookArgs: { accessToken, dayId },
+    request: Requests.activities.activity.delete,
+    requestHandler: requestWithRefresh,
+    preCallBack: (args) => onDeleteActivity(args.activityId),
+  });
+
+  return {
+    addActivity,
+    updateActivity,
+    reorderActivity,
+    deleteActivity,
+  };
 };
