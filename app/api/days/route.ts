@@ -7,12 +7,12 @@ import { DayController } from "@/server/controllers/day.controller";
 export const GET = httpRoute(async (req) => {
   const userId = authMiddleware(req);
   const data = await DayController.get(userId);
-  return httpResponse.success(Responses.day.get(data));
+  return httpResponse.success(Responses.days.get(data));
 });
 
 export const POST = httpRoute(async (req) => {
   const userId = authMiddleware(req);
   const activities = await req.json();
   const data = await DayController.add(userId, activities);
-  return httpResponse.success(Responses.day.add(data));
+  return httpResponse.success(Responses.days.day.add(data));
 });

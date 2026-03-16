@@ -18,7 +18,7 @@ export const PATCH = httpRoute<"dayId" | "activityId">(
       description,
       state,
     );
-    return httpResponse.success(Responses.activity.update(data));
+    return httpResponse.success(Responses.activities.activity.update(data));
   },
 );
 
@@ -28,6 +28,6 @@ export const DELETE = httpRoute<"dayId" | "activityId">(
     const dayId = options.params.dayId;
     const activityId = options.params.activityId;
     await ActivityController.delete(userId, dayId, activityId);
-    return httpResponse.success(Responses.activity.delete());
+    return httpResponse.success(Responses.activities.activity.delete());
   },
 );

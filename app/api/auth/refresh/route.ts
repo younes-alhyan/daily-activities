@@ -8,7 +8,7 @@ export const POST = httpRoute(async (req) => {
   const userId = authMiddleware(req, true);
   const { accessToken, refreshToken } = AuthController.refresh(userId);
   return httpResponse.success(
-    Responses.auth.refresh({ token: accessToken }),
+    Responses.auth.refresh({ accessToken }),
     refreshToken,
   );
 });

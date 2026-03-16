@@ -10,7 +10,7 @@ export const POST = httpRoute(async (req) => {
     password,
   );
   return httpResponse.success(
-    Responses.auth.login({ token: accessToken }),
+    Responses.auth.login({ accessToken }),
     refreshToken,
   );
 });

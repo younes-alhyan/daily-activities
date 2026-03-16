@@ -16,6 +16,6 @@ export const PATCH = httpRoute<"dayId" | "activityId">(
       activityId,
       newIndex,
     );
-    return httpResponse.success(Responses.activity.reorder());
+    return httpResponse.success(Responses.activities.activity.reorder());
   },
 );

@@ -15,5 +15,5 @@ export const POST = httpRoute<"dayId">(async (req, options) => {
     description,
     state,
   );
-  return httpResponse.success(Responses.activity.add(data));
+  return httpResponse.success(Responses.activities.add(data));
 });

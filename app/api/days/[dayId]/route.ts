@@ -8,5 +8,5 @@ export const DELETE = httpRoute<"dayId">(async (req, options) => {
   const userId = authMiddleware(req);
   const dayId = options.params.dayId;
   await DayController.delete(userId, dayId);
-  return httpResponse.success(Responses.day.delete());
+  return httpResponse.success(Responses.days.day.delete());
 });
