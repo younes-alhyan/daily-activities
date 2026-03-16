@@ -1,29 +1,42 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/client/contexts/AuthContext";
 import { useUser } from "@/client/hooks/useUser";
-import { UserView } from "@/client/views/UserView";
-import { LoadingPageComponent } from "@/client/components/LoadingComponent";
-import type { UserDTO } from "@/types/user.types";
+import { TopBar } from "./views/TopBar";
+import { UserData } from "./views/UserData";
+import { UserForm } from "./views/UserForm";
+import { ConfirmActionButton } from "./components/ConfirmActionButton";
+import { LoadingPage } from "@/app/LoadingPage";
 
 export default function UserPage() {
-  const [userDTO, setUserDTO] = useState<UserDTO>({
-    id: "",
-    username: "",
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const { logout } = useAuth();
-  const { getUser } = useUser();
+  const { user, getUser, updateUser, deleteUser } = useUser();
 
   useEffect(() => {
-    getUser()
-      .then((userDTO) => setUserDTO(userDTO))
-      .catch((error: unknown) => logout())
-      .finally(() => setIsLoading(false));
-  }, [logout, getUser]);
+    getUser.call();
+  }, []);
 
-  const onUpdateUserDTO = (userDTO: UserDTO) => setUserDTO(userDTO);
+  if (getUser.isLoading) return <LoadingPage />;
+  if (getUser.error) return <h1>Error getting user</h1>;
+  if (!user) return <LoadingPage />;
 
-  if (isLoading) return <LoadingPageComponent />;
-  return <UserView userDTO={userDTO} onUpdateUserDTO={onUpdateUserDTO} />;
+  return (
+    <div className="min-h-screen flex justify-center px-4 py-8">
+      <div className="w-full max-w-2xl flex flex-col gap-6">
+        <TopBar goBack={() => router.replace("/")} />
+        <UserData user={user} />
+        <UserForm
+          user={user}
+          updateUser={(body) => updateUser.call({ body })}
+        />
+          <ConfirmActionButton action="logout" actionHandler={logout} />
+          <ConfirmActionButton
+            action="delete"
+            actionHandler={deleteUser.call}
+          />
+      </div>
+    </div>
+  );
 }
