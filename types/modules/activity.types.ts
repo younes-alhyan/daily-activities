@@ -1,6 +1,5 @@
-import { Types } from "mongoose";
+import type { Types } from "mongoose";
 
-// Activity Type
 export const activityTypes = [
   "watching",
   "gaming",
@@ -9,7 +8,6 @@ export const activityTypes = [
 ] as const;
 export type ActivityType = (typeof activityTypes)[number];
 
-// Activity Interfaces
 export interface ActivityInput {
   type: ActivityType;
   description: string;
@@ -20,15 +18,4 @@ export interface ActivityDoc extends ActivityInput {
 }
 export interface ActivityDTO extends ActivityInput {
   id: string;
-}
-
-// Day Interfaces
-export interface DayDoc {
-  _id: Types.ObjectId;
-  userId: Types.ObjectId;
-  activities: ActivityDoc[];
-}
-export interface DayDTO {
-  id: string;
-  activities: ActivityDTO[];
 }

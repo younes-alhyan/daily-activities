@@ -1,7 +1,8 @@
-import type { Routes } from "@/types/routes.types";
-import type { ApiResponse } from "@/types/api.types";
-import type { UserDTO } from "@/types/user.types";
-import type { ActivityDTO, DayDTO } from "@/types/day.types";
+import type { ApiResponse } from "@/types/api/api.types";
+import type { Routes } from "@/types/api/routes.types";
+import type { ActivityDTO } from "@/types/modules/activity.types";
+import type { DayDTO } from "@/types/modules/day.types";
+import type { UserDTO } from "@/types/modules/user.types";
 
 type AuthResponses = {
   signup: () => ApiResponse<true>;

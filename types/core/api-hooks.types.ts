@@ -1,7 +1,11 @@
-import type { Routes } from "@/types/routes.types";
-import type { ApiHook } from "@/types/api.types";
-import type { UserInput, UserDTO } from "@/types/user.types";
-import type { ActivityInput, ActivityDTO, DayDTO } from "@/types/day.types";
+import type { ApiHook } from "@/types/api/api.types";
+import type { Routes } from "@/types/api/routes.types";
+import type {
+  ActivityInput,
+  ActivityDTO,
+} from "@/types/modules/activity.types";
+import type { DayDTO } from "@/types/modules/day.types";
+import type { UserInput, UserDTO } from "@/types/modules/user.types";
 
 type AuthHooks = {
   signup: ApiHook<{

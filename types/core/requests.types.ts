@@ -1,7 +1,7 @@
-import type { Routes } from "@/types/routes.types";
-import type { ApiRequest } from "@/types/api.types";
-import type { UserInput } from "@/types/user.types";
-import type { ActivityInput } from "@/types/day.types";
+import type { ApiRequest } from "@/types/api/api.types";
+import type { Routes } from "@/types/api/routes.types";
+import type { ActivityInput } from "@/types/modules/activity.types";
+import type { UserInput } from "@/types/modules/user.types";
 
 type AuthRequests = {
   signup: (args: { body: UserInput }) => ApiRequest<false, UserInput>;
