@@ -1,14 +1,14 @@
-type Route<T extends Record<string, any>> = {
+type Route<T extends Record<string, unknown>> = {
   [K in keyof T]: T[K];
 };
 
 type RoutesMap = {
-  auth: { signup: any; login: any; refresh: any };
-  user: { get: any; update: any; delete: any };
-  days: { get: any; day: { add: any; delete: any } };
+  auth: { signup: unknown; login: unknown; refresh: unknown };
+  user: { get: unknown; update: unknown; delete: unknown };
+  days: { get: unknown; day: { add: unknown; delete: unknown } };
   activities: {
-    add: any;
-    activity: { update: any; delete: any; reorder: any };
+    add: unknown;
+    activity: { update: unknown; delete: unknown; reorder: unknown };
   };
 };
 

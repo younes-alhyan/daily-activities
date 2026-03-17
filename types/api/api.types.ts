@@ -3,8 +3,8 @@ type HTTP_METHOD = "GET" | "POST" | "PATCH" | "DELETE";
 export type ApiRequest<TokenT extends boolean = false, BodyT = null> = {
   method: HTTP_METHOD;
   url: string;
-} & (TokenT extends true ? { accessToken: string } : {}) &
-  (BodyT extends null ? {} : { body: BodyT });
+} & (TokenT extends true ? { accessToken: string } : object) &
+  (BodyT extends null ? object : { body: BodyT });
 
 export type ApiResponse<SuccessT extends boolean = false, DataT = null> = {
   ok: SuccessT;
@@ -13,7 +13,7 @@ export type ApiResponse<SuccessT extends boolean = false, DataT = null> = {
 } & (SuccessT extends false
   ? { code: string }
   : DataT extends null
-    ? {}
+    ? object
     : { data: DataT });
 
 export class ApiError extends Error {
@@ -27,9 +27,9 @@ export class ApiError extends Error {
 
 export type ApiHookDef = {
   TokenT: boolean;
-  HookArgsT: Record<string, any> | null;
-  InputArgsT: Record<string, any> | null;
-  DataT: any;
+  HookArgsT: object | null;
+  InputArgsT: object | null;
+  DataT: unknown;
 };
 
 export type ApiHook<T extends ApiHookDef> = {
