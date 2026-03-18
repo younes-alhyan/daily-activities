@@ -1,4 +1,4 @@
-import { ApiError } from "@/types/api.types";
+import { ApiError } from "@/types/api/api.types";
 
 const createHttpError =
   (status: number, code: string, defaultMessage: string) =>

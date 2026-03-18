@@ -1,5 +1,5 @@
-import type { ApiResponse } from "@/types/api.types";
-import type { ResponsesRoutes } from "@/types/responses.types";
+import type { ApiResponse } from "@/types/api/api.types";
+import type { ResponsesRoutes } from "@/types/core/responses.types";
 
 const successApiResponse = (
   status: number,

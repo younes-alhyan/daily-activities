@@ -1,4 +1,4 @@
-import { RequestsRoutes } from "@/types/requests.types";
+import type { RequestsRoutes } from "@/types/core/requests.types";
 
 export const Requests: RequestsRoutes = {
   auth: {
