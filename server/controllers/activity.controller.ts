@@ -1,13 +1,13 @@
 import { Errors } from "@/lib/core/errors";
-import { toObjectId } from "@/lib/utils/toObjectId";
 import { cleanActivity } from "@/lib/utils/cleanObject";
+import { toObjectId } from "@/lib/utils/toObjectId";
 import { ActivityService } from "@/server/services/activity.service";
-import { activityTypes } from "@/types/day.types";
-import type {
-  ActivityType,
-  ActivityInput,
-  ActivityDTO,
-} from "@/types/day.types";
+import {
+  activityTypes,
+  type ActivityType,
+  type ActivityInput,
+  type ActivityDTO,
+} from "@/types/modules/activity.types";
 
 const isActivityType = (value: unknown): value is ActivityType => {
   return (

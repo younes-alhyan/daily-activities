@@ -1,7 +1,7 @@
-import { Jwt } from "@/lib/utils/jwt";
 import { Errors } from "@/lib/core/errors";
+import { Jwt } from "@/lib/utils/jwt";
 import { AuthService } from "@/server/services/auth.service";
-import type { UserInput } from "@/types/user.types";
+import type { UserInput } from "@/types/modules/user.types";
 
 const signup = async (username: unknown, password: unknown): Promise<void> => {
   if (typeof username !== "string" || username.trim() === "") {

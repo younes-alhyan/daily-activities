@@ -1,13 +1,17 @@
 import { Errors } from "@/lib/core/errors";
-import { toObjectId } from "@/lib/utils/toObjectId";
 import { cleanDay } from "@/lib/utils/cleanObject";
+import { toObjectId } from "@/lib/utils/toObjectId";
 import { DayService } from "@/server/services/day.service";
-import type { ActivityInput, DayDTO } from "@/types/day.types";
+import type { ActivityInput } from "@/types/modules/activity.types";
+import type { DayDTO } from "@/types/modules/day.types";
 
-const isActivityInput = (obj: any): obj is ActivityInput => {
+const isActivityInput = (obj: unknown): obj is ActivityInput => {
   return (
     typeof obj === "object" &&
     obj !== null &&
+    "type" in obj &&
+    "description" in obj &&
+    "state" in obj &&
     typeof obj.type === "string" &&
     (obj.description === undefined || typeof obj.description === "string") &&
     (obj.state === undefined || typeof obj.state === "boolean")
