@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import bcrypt from "bcryptjs";
 import { Schema, model, models } from "mongoose";
 import type { Model, HydratedDocument } from "mongoose";
-import type { UserDoc } from "@/types/user.types";
+import type { UserDoc } from "@/types/modules/user.types";
 
 type UserMethods = {
   comparePassword(plainPassword: string): Promise<boolean>;
