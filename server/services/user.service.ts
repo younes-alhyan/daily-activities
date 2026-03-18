@@ -1,9 +1,9 @@
-import { Types } from "mongoose";
-import { Errors } from "@/lib/core/errors";
 import { runService } from "@/lib/db";
-import { UserModel } from "@/server/models/user.model";
+import { Errors } from "@/lib/core/errors";
 import { DayModel } from "@/server/models/day.model";
-import type { UserDoc } from "@/types/user.types";
+import { UserModel } from "@/server/models/user.model";
+import type { Types } from "mongoose";
+import type { UserDoc } from "@/types/modules/user.types";
 
 const getUser = (id: Types.ObjectId) =>
   runService(async () => {

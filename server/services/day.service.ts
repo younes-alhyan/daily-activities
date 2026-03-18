@@ -1,8 +1,9 @@
-import { Types } from "mongoose";
 import { runService } from "@/lib/db";
 import { Errors } from "@/lib/core/errors";
 import { DayModel } from "@/server/models/day.model";
-import type { ActivityInput, DayDoc } from "@/types/day.types";
+import type { Types } from "mongoose";
+import type { ActivityInput } from "@/types/modules/activity.types";
+import type { DayDoc } from "@/types/modules/day.types";
 
 const getDays = (userId: Types.ObjectId) =>
   runService(async () => {

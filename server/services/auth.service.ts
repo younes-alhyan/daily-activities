@@ -1,9 +1,9 @@
 import { MongoServerError } from "mongodb";
-import { Errors } from "@/lib/core/errors";
 import { runService } from "@/lib/db";
-import { UserModel } from "@/server/models/user.model";
+import { Errors } from "@/lib/core/errors";
 import { DayModel } from "@/server/models/day.model";
-import type { UserInput } from "@/types/user.types";
+import { UserModel } from "@/server/models/user.model";
+import type { UserInput } from "@/types/modules/user.types";
 
 const signup = (user: UserInput) =>
   runService(async () => {
