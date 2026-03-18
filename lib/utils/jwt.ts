@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
-import { StringValue } from "ms";
 import { Errors } from "@/lib/core/errors";
+import type { StringValue } from "ms";
 
-const REFRESH_SECRET = process.env.REFRESH_SECRET as string;
-const ACCESS_SECRET = process.env.ACCESS_SECRET as string;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
+const ACCESS_SECRET = process.env.ACCESS_SECRET;
 
 if (!REFRESH_SECRET || !ACCESS_SECRET) {
   console.error("Missing REFRESH_SECRET or ACCESS_SECRET environment variable");
@@ -28,7 +28,7 @@ const verifyToken = (token: string, secret: string): JwtPayload => {
     }
 
     return decoded as JwtPayload;
-  } catch (error: unknown) {
+  } catch {
     throw Errors.UNAUTHORIZED_ERROR("Invalid or expired token");
   }
 };
