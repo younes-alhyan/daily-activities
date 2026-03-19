@@ -1,24 +1,17 @@
-import { Errors } from "@/lib/core/errors";
 import { httpResponse } from "@/lib/http/httpResponse";
-import { ApiError } from "@/types/api.types";
+import { Errors } from "@/lib/core/errors";
+import type { NextApiRequest } from "next";
+import { ApiError } from "@/types/api/api.types";
 
 export const httpRoute =
-  <P extends string = never>(
-    handler: (
-      req: Request,
-      options: { params: Record<P, string> },
-    ) => Promise<Response>,
-  ) =>
-  async (req: Request, options?: { params: Promise<Record<P, string>> }) => {
+  (handler: (req: NextApiRequest) => Promise<Response>) =>
+  async (req: NextApiRequest) => {
     try {
-      const resolvedParams = await options?.params;
-
-      return await handler(req, {
-        params: resolvedParams ?? ({} as Record<P, string>),
-      });
+      return await handler(req);
     } catch (error: unknown) {
-      return error instanceof ApiError
-        ? httpResponse.error(error.response)
-        : httpResponse.error(Errors.INTERNAL_SERVER_ERROR().response);
+      if (error instanceof ApiError) return httpResponse.error(error.response);
+
+      console.error("Unexpected API Error:", error);
+      return httpResponse.error(Errors.INTERNAL_SERVER_ERROR().response);
     }
   };
