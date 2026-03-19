@@ -1,35 +1,30 @@
 import mongoose from "mongoose";
 import { Errors } from "@/lib/core/errors";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  console.error("Missing MONGODB_URI environment variable");
-  throw Errors.INTERNAL_SERVER_ERROR();
-}
-
-let cached = (global as any).mongoose;
-if (!cached) cached = (global as any).mongoose = { conn: null, promise: null };
+let cached = global.mongooseCache;
+if (!cached) cached = global.mongooseCache = { conn: null, promise: null };
 
 async function connectDB() {
-  if (cached.conn) return cached.conn;
+  if (!MONGODB_URI) {
+    console.error("Missing MONGODB_URI environment variable");
+    throw Errors.INTERNAL_SERVER_ERROR();
+  }
 
+  if (cached.conn) return cached.conn;
   if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(MONGODB_URI, {
-        bufferCommands: false,
-      })
-      .catch((error: unknown) => {
-        console.error("MongoDB connection failed:", error);
-        cached.promise = null;
-        throw Errors.INTERNAL_SERVER_ERROR();
-      });
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      bufferCommands: false,
+    });
   }
 
   try {
     cached.conn = await cached.promise;
     return cached.conn;
-  } catch(error: unknown) {
+  } catch (error: unknown) {
+    cached.promise = null;
+    console.error("MongoDB connection failed:", error);
     throw Errors.INTERNAL_SERVER_ERROR();
   }
 }
