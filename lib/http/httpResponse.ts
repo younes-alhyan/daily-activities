@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import type { ApiResponse } from "@/types/api.types";
+import type { ApiResponse } from "@/types/api/api.types";
 
 const successApiResponse = (
-  payload: ApiResponse<true, any>,
+  payload: ApiResponse<true, unknown>,
   refreshToken?: string,
 ): Response => {
   const response = NextResponse.json(payload, { status: payload.status });
