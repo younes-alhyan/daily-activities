@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Errors } from "@/lib/core/errors";
 import type { StringValue } from "ms";
+import type { NextRequest } from "next/server";
 
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
@@ -34,29 +35,19 @@ const verifyToken = (token: string, secret: string): JwtPayload => {
 };
 
 const RefreshToken = {
-  get: (req: Request) => {
-    const cookieHeader = req.headers.get("cookie") || "";
-    const cookies: Record<string, string> = {};
-    cookieHeader.split(";").forEach((cookie) => {
-      const [name, ...rest] = cookie.trim().split("=");
-      if (!name) return;
-      cookies[name] = rest.join("=");
-    });
-
-    const token = cookies.refreshToken;
-    if (!token) throw Errors.UNAUTHORIZED_ERROR("Refresh token missing");
-
-    return token;
+  get: (req: NextRequest) => {
+    const refreshToken = req.cookies.get("refreshToken");
+    if (refreshToken) return refreshToken.value;
+    throw Errors.UNAUTHORIZED_ERROR("Refresh token missing");
   },
   sign: (userId: string) => signToken(userId, REFRESH_SECRET, "30d"),
   verify: (token: string) => verifyToken(token, REFRESH_SECRET),
 };
 const AccessToken = {
-  get: (req: Request) => {
-    const authHeader = req.headers.get("Authorization") || "";
-    if (!authHeader?.startsWith("Bearer "))
-      throw Errors.UNAUTHORIZED_ERROR("Invalid Authorization header");
-    return authHeader.replace("Bearer ", "");
+  get: (req: NextRequest) => {
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader) return authHeader.replace("Bearer ", "");
+    throw Errors.UNAUTHORIZED_ERROR("Invalid Authorization header");
   },
   sign: (userId: string) => signToken(userId, ACCESS_SECRET, "1h"),
   verify: (token: string) => verifyToken(token, ACCESS_SECRET),
