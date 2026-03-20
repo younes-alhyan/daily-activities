@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
+import { Requests } from "@/lib/core/requests";
 import { useAuth } from "@/client/contexts/AuthContext";
 import { useApi } from "@/client/hooks/useApi";
-import { Requests } from "@/lib/core/requests";
-import type { ApiHooksRoutes } from "@/types/apiHooks.types";
-import type { UserDTO } from "@/types/user.types";
+import type { ApiHooksRoutes } from "@/types/core/api-hooks.types";
+import type { UserDTO } from "@/types/modules/user.types";
 
 export function useUser() {
   const [user, setUser] = useState<UserDTO>({ id: "", username: "" });

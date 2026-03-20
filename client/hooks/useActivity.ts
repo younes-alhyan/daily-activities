@@ -1,8 +1,8 @@
+import { Requests } from "@/lib/core/requests";
 import { useAuth } from "@/client/contexts/AuthContext";
 import { useApi } from "@/client/hooks/useApi";
-import { Requests } from "@/lib/core/requests";
-import type { ApiHooksRoutes } from "@/types/apiHooks.types";
-import type { ActivityDTO } from "@/types/day.types";
+import type { ApiHooksRoutes } from "@/types/core/api-hooks.types";
+import type { ActivityDTO } from "@/types/modules/activity.types";
 
 export const useActivity = (
   dayId: string,
