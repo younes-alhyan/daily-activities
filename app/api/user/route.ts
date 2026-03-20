@@ -1,6 +1,6 @@
+import { httpResponse } from "@/lib/http/httpResponse";
 import { httpRoute } from "@/lib/http/httpRoute";
 import { Responses } from "@/lib/core/responses";
-import { httpResponse } from "@/lib/http/httpResponse";
 import { authMiddleware } from "@/lib/middlewares/authMiddleware";
 import { UserController } from "@/server/controllers/user.controller";
 
