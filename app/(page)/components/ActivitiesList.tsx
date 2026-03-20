@@ -1,10 +1,11 @@
 "use client";
 import { Reorder } from "framer-motion";
 import { Plus } from "lucide-react";
-import { Button } from "@/client/components/button";
 import { useActivity } from "@/client/hooks/useActivity";
-import { ActivityCard } from "../components/ActivityCard";
-import type { ActivityDTO, DayDTO } from "@/types/day.types";
+import { Button } from "@/client/components/ui/button";
+import { ActivityCard } from "@/app/(page)/components/ActivityCard";
+import type { ActivityDTO } from "@/types/modules/activity.types";
+import type { DayDTO } from "@/types/modules/day.types";
 
 interface ActivitiesListProps {
   day: DayDTO;

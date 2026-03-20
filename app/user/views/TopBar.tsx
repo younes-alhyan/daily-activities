@@ -1,6 +1,6 @@
 import { ChevronLeft, User } from "lucide-react";
-import { Button } from "@/client/components/button";
-import { Card, CardTitle, CardAction } from "@/client/components/card";
+import { Button } from "@/client/components/ui/button";
+import { Card, CardTitle, CardAction } from "@/client/components/ui/card";
 
 interface TopBarProps {
   goBack: () => void;

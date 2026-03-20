@@ -3,8 +3,8 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-} from "@/client/components/card";
-import type { UserDTO } from "@/types/user.types";
+} from "@/client/components/ui/card";
+import type { UserDTO } from "@/types/modules/user.types";
 
 interface UserDataProps {
   user: UserDTO;

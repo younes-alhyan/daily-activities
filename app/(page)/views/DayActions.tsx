@@ -1,7 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { Plus, Trash2, User } from "lucide-react";
-import { Button } from "@/client/components/button";
+import { useRouter } from "next/navigation";
+import { Button } from "@/client/components/ui/button";
 
 interface DayActionsProps {
   addDay: () => void;

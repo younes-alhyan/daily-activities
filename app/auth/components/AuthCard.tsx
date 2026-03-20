@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/client/components/button";
-import { Input } from "@/client/components/input";
-import { Label } from "@/client/components/label";
-import type { UserInput } from "@/types/user.types";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Label } from "@/client/components/ui/label";
+import type { UserInput } from "@/types/modules/user.types";
 
 interface AuthCardProps {
   mode: "login" | "signup";

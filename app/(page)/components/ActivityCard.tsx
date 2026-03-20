@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
-import { ActivityInfo } from "./ActivityInfo";
-import { ActivityActions } from "./ActivityActions";
-import { Card, CardContent } from "@/client/components/card";
-import { Textarea } from "@/client/components/textarea";
-import { Checkbox } from "@/client/components/checkbox";
-import type { ApiHooksRoutes } from "@/types/apiHooks.types";
-import type { ActivityDTO, ActivityInput } from "@/types/day.types";
+import { Card, CardContent } from "@/client/components/ui/card";
+import { Checkbox } from "@/client/components/ui/checkbox";
+import { Textarea } from "@/client/components/ui/textarea";
+import { ActivityActions } from "@/app/(page)/components/ActivityActions";
+import { ActivityInfo } from "@/app/(page)/components/ActivityInfo";
+import type { ApiHooksRoutes } from "@/types/core/api-hooks.types";
+import type { ActivityDTO, ActivityInput } from "@/types/modules/activity.types";
 
 interface ActivityCardProps {
   activity: ActivityDTO;

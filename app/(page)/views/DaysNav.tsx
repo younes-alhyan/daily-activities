@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/client/components/button";
+import { Button } from "@/client/components/ui/button";
 
 interface DaysNavProps {
   daysCount: number;

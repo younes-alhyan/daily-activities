@@ -1,15 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Label } from "@/client/components/label";
-import { Input } from "@/client/components/input";
-import { Button } from "@/client/components/button";
+import { useState } from "react";
+import { Button } from "@/client/components/ui/button";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-} from "@/client/components/card";
-import type { UserInput, UserDTO } from "@/types/user.types";
+} from "@/client/components/ui/card";
+import { Input } from "@/client/components/ui/input";
+import { Label } from "@/client/components/ui/label";
+import type { UserInput, UserDTO } from "@/types/modules/user.types";
 
 interface UserFormProps {
   user: UserDTO;
@@ -21,11 +21,6 @@ export function UserForm({ user, updateUser }: UserFormProps) {
     username: user.username,
     password: "",
   });
-
-  // Initialize with current user data
-  useEffect(() => {
-    setUserInput({ username: user.username, password: "" });
-  }, [user]);
 
   const updateUserHandler = (input: UserInput) => {
     if (!input.username.trim() && !input.password.trim()) return;

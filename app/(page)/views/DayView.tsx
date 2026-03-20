@@ -1,10 +1,10 @@
 import { useDay } from "@/client/hooks/useDay";
-import { DaysNav } from "./DaysNav";
-import { DayActions } from "./DayActions";
-import { ActivitiesProgressBar } from "../components/ActivitiesProgressBar";
-import { ActivitiesList } from "../components/ActivitiesList";
+import { ActivitiesList } from "@/app/(page)/components/ActivitiesList";
+import { ActivitiesProgressBar } from "@/app/(page)/components/ActivitiesProgressBar";
+import { DayActions } from "@/app/(page)/views/DayActions";
+import { DaysNav } from "@/app/(page)/views/DaysNav";
 import type { SetStateAction } from "react";
-import type { DayDTO } from "@/types/day.types";
+import type { DayDTO } from "@/types/modules/day.types";
 
 interface DayViewProps {
   day: DayDTO;

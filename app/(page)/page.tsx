@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useDays } from "@/client/hooks/useDays";
-import { DayView } from "./views/DayView";
-import { LoadingPage } from "@/app/LoadingPage";
+import { LoadingPage } from "@/client/components/LoadingPage";
+import { DayView } from "@/app/(page)/views/DayView";
 
 export default function DayPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -16,14 +16,14 @@ export default function DayPage() {
     };
 
     fetchDays();
-  }, []);
+  }, [getDays]);
 
-  if (getDays.isLoading || !days) return <LoadingPage />; 
+  if (getDays.isLoading || !days) return <LoadingPage />;
   if (getDays.error) return <h1>Error getting days</h1>;
   if (days.length === 0) return <h1>No Days Yet</h1>;
-  
+
   const day = days[selectedIndex];
-    
+
   const onSelectNext = () => {
     setSelectedIndex((prev) => Math.min(prev + 1, days.length - 1));
   };

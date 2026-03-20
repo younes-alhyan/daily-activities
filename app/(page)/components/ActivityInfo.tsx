@@ -1,13 +1,15 @@
 import { ChevronDown, Film, Gamepad2, Code, BookOpen } from "lucide-react";
-import { Button } from "@/client/components/button";
+import { Button } from "@/client/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/client/components/dropdown-menu";
-import { activityTypes } from "@/types/day.types";
-import type { ActivityType } from "@/types/day.types";
+} from "@/client/components/ui/dropdown-menu";
+import {
+  activityTypes,
+  type ActivityType,
+} from "@/types/modules/activity.types";
 
 const activitiesInfoMap = {
   watching: { icon: Film, color: "text-accent-red", duration: 2 },
@@ -36,7 +38,10 @@ export function ActivityInfo({
     return (
       <div className="flex items-center gap-2 min-w-0">
         <DropdownMenu>
-          <DropdownMenuTrigger className="bg-accent border-input text-foreground" asChild>
+          <DropdownMenuTrigger
+            className="bg-accent border-input text-foreground"
+            asChild
+          >
             <Button>
               <ActivityIcon className={color} /> {activityType} <ChevronDown />
             </Button>

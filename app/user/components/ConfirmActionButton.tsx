@@ -1,13 +1,13 @@
 "use client";
-import { useState } from "react";
 import { LogOut, Trash2 } from "lucide-react";
-import { Button } from "@/client/components/button";
+import { useState } from "react";
+import { Button } from "@/client/components/ui/button";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-} from "@/client/components/card";
+} from "@/client/components/ui/card";
 
 const actionsMap = {
   logout: {

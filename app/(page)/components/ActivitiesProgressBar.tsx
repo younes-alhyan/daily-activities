@@ -1,5 +1,5 @@
-import { Progress } from "@/client/components/progress";
-import type { ActivityDTO } from "@/types/day.types";
+import { Progress } from "@/client/components/ui/progress";
+import type { ActivityDTO } from "@/types/modules/activity.types";
 
 interface ActivitiesProgressBarProps {
   activities: ActivityDTO[];

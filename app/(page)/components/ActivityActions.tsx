@@ -1,5 +1,5 @@
 import { Pencil, Trash2, Check, X } from "lucide-react";
-import { Button } from "@/client/components/button";
+import { Button } from "@/client/components/ui/button";
 
 interface ActivityActionsProps {
   isEditing: boolean;

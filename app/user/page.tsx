@@ -1,13 +1,13 @@
 "use client";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAuth } from "@/client/contexts/AuthContext";
 import { useUser } from "@/client/hooks/useUser";
-import { TopBar } from "./views/TopBar";
-import { UserData } from "./views/UserData";
-import { UserForm } from "./views/UserForm";
-import { ConfirmActionButton } from "./components/ConfirmActionButton";
-import { LoadingPage } from "@/app/LoadingPage";
+import { LoadingPage } from "@/client/components/LoadingPage";
+import { ConfirmActionButton } from "@/app/user/components/ConfirmActionButton";
+import { TopBar } from "@/app/user/views/TopBar";
+import { UserData } from "@/app/user/views/UserData";
+import { UserForm } from "@/app/user/views/UserForm";
 
 export default function UserPage() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function UserPage() {
 
   useEffect(() => {
     getUser.call();
-  }, []);
+  }, [getUser]);
 
   if (getUser.isLoading) return <LoadingPage />;
   if (getUser.error) return <h1>Error getting user</h1>;
