@@ -2,8 +2,8 @@ import { Schema, model, models, Types, type Model } from "mongoose";
 import {
   activityTypes,
   type ActivityDoc,
-} from "@/types/modules/activity.types";
-import type { DayDoc } from "@/types/modules/day.types";
+} from "@/modules/types/activity.types";
+import type { DayDoc } from "@/modules/types/day.types";
 
 const activitySchema = new Schema<ActivityDoc>({
   type: {
