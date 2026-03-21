@@ -1,4 +1,13 @@
-import { ApiError } from "@/types/api/api.types";
+import type { ApiResponse } from "@/types/api.types";
+
+export class ApiError extends Error {
+  response: ApiResponse<false>;
+  constructor(response: ApiResponse<false>) {
+    super(response.message);
+    this.name = "ApiError";
+    this.response = response;
+  }
+}
 
 const createHttpError =
   (status: number, code: string, defaultMessage: string) =>
