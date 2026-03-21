@@ -1,5 +1,5 @@
 import type { Types } from "mongoose";
-import type { ActivityDoc, ActivityDTO } from "@/types/modules/activity.types";
+import type { ActivityDoc, ActivityDTO } from "@/modules/types/activity.types";
 
 export interface DayDoc {
   _id: Types.ObjectId;
