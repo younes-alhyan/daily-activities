@@ -1,78 +1,70 @@
 "use client";
 import { useState } from "react";
-import { Errors } from "@/lib/core/errors";
-import { ApiError } from "@/types/api.types";
-import type {
-  ApiRequest,
-  ApiResponse,
-  ApiHookDef,
-  ApiHook,
-} from "@/types/api.types";
+import { ApiError, Errors } from "@/lib/utils/errors";
+import type { Func } from "@/types/helpers.types";
+import type { ApiResponse, ApiHook, ApiEndpoint } from "@/types/api.types";
+import type { ApiRequestConstructor } from "@/types/core.types";
 
-type HookArgs<T extends ApiHookDef> = T["HookArgsT"] extends null
-  ? {}
-  : T["HookArgsT"];
-type InputArgs<T extends ApiHookDef> = T["InputArgsT"] extends null
-  ? {}
-  : T["InputArgsT"];
-type RequestArgs<T extends ApiHookDef> = HookArgs<T> & InputArgs<T>;
-
-type UseApiProps<
-  T extends ApiHookDef,
-  PreResult = void,
-> = (keyof HookArgs<T> extends never ? {} : { hookArgs: HookArgs<T> }) & {
-  request: keyof RequestArgs<T> extends never
-    ? () => ApiRequest<T["TokenT"], any>
-    : (args: RequestArgs<T>) => ApiRequest<T["TokenT"], any>;
-
+export const useApi = <
+  T extends ApiEndpoint<object | null, object | null, object | null>,
+  PreResultT = void,
+>(props: {
+  hookArgs?: T["HookArgsT"];
+  requestConstructor: ApiRequestConstructor<T>;
   requestHandler: <DataT = T["DataT"]>(
-    req: ApiRequest<T["TokenT"], any>,
+    request: ReturnType<ApiRequestConstructor<T>>,
   ) => Promise<ApiResponse<true, DataT>>;
-
-  preCallBack?: (args: RequestArgs<T>) => PreResult;
-
-  postCallBack?: (data: T["DataT"], args: RequestArgs<T> & PreResult) => void;
-};
-
-export const useApi = <T extends ApiHookDef, PreResultT = void>(
-  props: UseApiProps<T, PreResultT>,
-): ApiHook<T>["Hook"] => {
+  preCallBack?: (args: T["ArgsT"]) => PreResultT;
+  postCallBack?: (args: {
+    args: T["ArgsT"] & PreResultT;
+    data: T["DataT"];
+  }) => void;
+}): ApiHook<T["InputArgsT"], T["DataT"]> => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
+  const [error, setError] = useState<ApiResponse<false> | null>(null);
   const clearError = () => setError(null);
-  const { request, requestHandler, preCallBack, postCallBack } = props;
+  const {
+    hookArgs,
+    requestConstructor,
+    requestHandler,
+    preCallBack,
+    postCallBack,
+  } = props;
 
-  const call: T["InputArgsT"] extends null
-    ? () => Promise<ApiResponse<true, T["DataT"]> | undefined>
-    : (
-        input: T["InputArgsT"],
-      ) => Promise<ApiResponse<true, T["DataT"]> | undefined> = async (
-    input?: T["InputArgsT"],
-  ) => {
-    const allArgs: RequestArgs<T> = {
-      ...("hookArgs" in props ? props.hookArgs : {}),
-      ...(input ?? ({} as InputArgs<T>)),
-    };
+  const call = (async (args?: T["InputArgsT"]) => {
+    const allArgs = {
+      ...(hookArgs ?? {}),
+      ...(args ?? {}),
+    } as NonNullable<T["ArgsT"]>;
 
-    let preCallBackResult = preCallBack?.(allArgs) as PreResultT;
+    const preCallBackResult = preCallBack?.(allArgs) as PreResultT;
     setIsLoading(true);
     clearError();
 
     try {
-      const res = await requestHandler(request(allArgs));
+      const request = requestConstructor(allArgs) as ReturnType<
+        ApiRequestConstructor<T>
+      >;
+      const res = await requestHandler(request);
 
       if ("data" in res && postCallBack) {
-        postCallBack(res.data, { ...allArgs, ...preCallBackResult });
+        postCallBack({
+          args: { ...allArgs, ...preCallBackResult },
+          data: res.data,
+        });
       }
 
       return res;
-    } catch (err: unknown) {
-      if (err instanceof ApiError) setError(err);
-      else setError(Errors.CLIENT_RUNTIME_ERROR());
+    } catch (error: unknown) {
+      if (error instanceof ApiError) setError(error.response);
+      else setError(Errors.CLIENT_RUNTIME_ERROR().response);
     } finally {
       setIsLoading(false);
     }
-  };
+  }) as Func<
+    T["InputArgsT"],
+    Promise<ApiResponse<true, T["DataT"]> | undefined>
+  >;
 
   return { isLoading, error, clearError, call };
 };
