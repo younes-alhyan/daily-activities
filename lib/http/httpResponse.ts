@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import type { ApiResponse } from "@/types/api/api.types";
+import type { ApiResponse } from "@/types/api.types";
 
 const successApiResponse = (
-  payload: ApiResponse<true, unknown>,
+  payload: ApiResponse<true, object | null>,
   refreshToken?: string,
-): Response => {
+) => {
   const response = NextResponse.json(payload, { status: payload.status });
 
   if (refreshToken) {
@@ -22,7 +22,7 @@ const successApiResponse = (
   return response;
 };
 
-const errorApiResponse = (payload: ApiResponse<false>): Response => {
+const errorApiResponse = (payload: ApiResponse<false>) => {
   return NextResponse.json(payload, { status: payload.status });
 };
 

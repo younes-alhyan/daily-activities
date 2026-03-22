@@ -1,13 +1,20 @@
 import { httpResponse } from "@/lib/http/httpResponse";
-import { Errors } from "@/lib/core/errors";
-import type { NextRequest } from "next/server";
-import { ApiError } from "@/types/api/api.types";
+import { ApiError, Errors } from "@/lib/utils/errors";
+import type { NextRequest, NextResponse } from "next/server";
 
-export const httpRoute =
-  (handler: (req: NextRequest) => Promise<Response>) =>
-  async (req: NextRequest) => {
+type HandlerT = (
+  req: NextRequest,
+  params: Record<string, string>,
+) => Promise<NextResponse>;
+
+export function httpRoute(handler: HandlerT) {
+  return async (
+    req: NextRequest,
+    { params }: { params: Promise<Record<string, string>> },
+  ) => {
     try {
-      return await handler(req);
+      const routeParams = await params;
+      return await handler(req, routeParams);
     } catch (error: unknown) {
       if (error instanceof ApiError) return httpResponse.error(error.response);
 
@@ -15,3 +22,4 @@ export const httpRoute =
       return httpResponse.error(Errors.INTERNAL_SERVER_ERROR().response);
     }
   };
+}

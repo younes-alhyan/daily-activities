@@ -1,6 +1,6 @@
-import type { ActivityDoc, ActivityDTO } from "@/types/modules/activity.types";
-import type { DayDoc, DayDTO } from "@/types/modules/day.types";
-import type { UserDoc, UserDTO } from "@/types/modules/user.types";
+import type { ActivityDoc, ActivityDTO } from "@/modules/types/activity.types";
+import type { DayDoc, DayDTO } from "@/modules/types/day.types";
+import type { UserDoc, UserDTO } from "@/modules/types/user.types";
 
 export const cleanUser = (user: UserDoc): UserDTO => ({
   id: user._id.toString(),

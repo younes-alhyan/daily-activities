@@ -1,6 +1,5 @@
-import { Errors } from "@/lib/core/errors";
-import { ApiError } from "@/types/api/api.types";
-import type { ApiRequest, ApiResponse } from "@/types/api/api.types";
+import { ApiError, Errors } from "@/lib/utils/errors";
+import type { ApiRequest, ApiResponse } from "@/types/api.types";
 
 async function fetchHelper(url: string, init: RequestInit): Promise<Response> {
   try {
@@ -29,7 +28,7 @@ async function parseJsonHelper<T>(
 }
 
 export async function httpRequest<T = null>(
-  request: ApiRequest | ApiRequest<true, unknown>,
+  request: ApiRequest<boolean, object | null>,
 ): Promise<ApiResponse<true, T>> {
   const { method, url } = request;
 

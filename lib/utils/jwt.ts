@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { Errors } from "@/lib/core/errors";
+import { Errors } from "@/lib/utils/errors";
 import type { StringValue } from "ms";
 import type { NextRequest } from "next/server";
 

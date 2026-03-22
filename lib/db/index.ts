@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Errors } from "@/lib/core/errors";
+import { Errors } from "@/lib/utils/errors";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
