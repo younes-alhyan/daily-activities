@@ -34,74 +34,119 @@ const eslintConfig = defineConfig([
         {
           groups: ["external", "internal", "type", "unknown"],
           pathGroups: [
-            // Types
-            { pattern: "@/types/api/**", group: "type", position: "after" },
-            { pattern: "@/types/core/**", group: "type", position: "after" },
+            // Lib
+            { pattern: "@/lib/db", group: "internal", position: "before" },
+            { pattern: "@/lib/http/*", group: "internal", position: "before" },
             {
-              pattern: "@/types/modules/**",
+              pattern: "@/lib/middlewares/*",
+              group: "internal",
+              position: "before",
+            },
+            {
+              pattern: "@/lib/utils/*",
+              group: "internal",
+              position: "before",
+            },
+
+            // Models
+            {
+              pattern: "@/modules/models/*",
+              group: "internal",
+              position: "before",
+            },
+
+            // Features
+            {
+              pattern: "@/features/*",
+              group: "internal",
+              position: "before",
+            },
+
+            // Api
+            {
+              pattern: "@/app/api/**/services",
+              group: "internal",
+              position: "before",
+            },
+            {
+              pattern: "@/app/api/**/controllers",
+              group: "internal",
+              position: "before",
+            },
+
+            // Contexts
+            {
+              pattern: "@/client/contexts/*",
+              group: "internal",
+              position: "before",
+            },
+            {
+              pattern: "@/app/**/contexts/*",
+              group: "internal",
+              position: "before",
+            },
+
+            // Hooks
+            {
+              pattern: "@/client/hooks/*",
+              group: "internal",
+              position: "before",
+            },
+            {
+              pattern: "@/app/**/hooks/*",
+              group: "internal",
+              position: "before",
+            },
+
+            // Views
+            {
+              pattern: "@/client/views/*",
+              group: "internal",
+              position: "before",
+            },
+            {
+              pattern: "@/app/**/views/*",
+              group: "internal",
+              position: "before",
+            },
+
+            // Components
+            {
+              pattern: "@/client/components/*",
+              group: "internal",
+              position: "before",
+            },
+            {
+              pattern: "@/app/**/components/*",
+              group: "internal",
+              position: "before",
+            },
+
+            // Types
+            {
+              pattern: "@/types/helpers.types",
               group: "type",
               position: "after",
             },
-
-            // Lib
-            { pattern: "@/lib/db", group: "internal", position: "before" },
-            { pattern: "@/lib/http/**", group: "internal", position: "before" },
-            { pattern: "@/lib/core/**", group: "internal", position: "before" },
             {
-              pattern: "@/lib/middlewares/**",
-              group: "internal",
-              position: "before",
+              pattern: "@/types/api.types",
+              group: "type",
+              position: "after",
             },
             {
-              pattern: "@/lib/utils/**",
-              group: "internal",
-              position: "before",
-            },
-
-            // Server
-            {
-              pattern: "@/server/models/**",
-              group: "internal",
-              position: "before",
+              pattern: "@/types/core.types",
+              group: "type",
+              position: "after",
             },
             {
-              pattern: "@/server/services/**",
-              group: "internal",
-              position: "before",
+              pattern: "@/modules/types/*",
+              group: "type",
+              position: "after",
             },
             {
-              pattern: "@/server/controllers/**",
-              group: "internal",
-              position: "before",
-            },
-
-            // Client
-            {
-              pattern: "@/client/contexts/**",
-              group: "internal",
-              position: "before",
-            },
-            {
-              pattern: "@/client/hooks/**",
-              group: "internal",
-              position: "before",
-            },
-            {
-              pattern: "@/client/components/**",
-              group: "internal",
-              position: "before",
-            },
-
-            // App
-            {
-              pattern: "@/app/**/components/**",
-              group: "internal",
-              position: "before",
-            },
-            {
-              pattern: "@/app/**/views/**",
-              group: "internal",
-              position: "before",
+              pattern: "@/features/*/types",
+              group: "type",
+              position: "after",
             },
 
             // Styles
