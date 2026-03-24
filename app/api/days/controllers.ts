@@ -1,9 +1,9 @@
-import { Errors } from "@/lib/core/errors";
 import { cleanDay } from "@/lib/utils/cleanObject";
+import { Errors } from "@/lib/utils/errors";
 import { toObjectId } from "@/lib/utils/toObjectId";
-import { DayService } from "@/server/services/day.service";
-import type { ActivityInput } from "@/types/modules/activity.types";
-import type { DayDTO } from "@/types/modules/day.types";
+import { daysServices } from "@/app/api/days/services";
+import type { ActivityInput } from "@/modules/types/activity.types";
+import type { DayDTO } from "@/modules/types/day.types";
 
 const isActivityInput = (obj: unknown): obj is ActivityInput => {
   return (
@@ -19,7 +19,7 @@ const isActivityInput = (obj: unknown): obj is ActivityInput => {
 };
 
 const getDays = async (userId: string): Promise<DayDTO[]> => {
-  const doc = await DayService.get(toObjectId(userId, "userId"));
+  const doc = await daysServices.get(toObjectId(userId, "userId"));
   return doc.map(cleanDay);
 };
 
@@ -36,18 +36,14 @@ const addDay = async (userId: string, activities: unknown): Promise<DayDTO> => {
     activitiesList = activities;
   }
 
-  const doc = await DayService.add(
+  const doc = await daysServices.add(
     toObjectId(userId, "userId"),
     activitiesList,
   );
   return cleanDay(doc);
 };
 
-const deleteDay = (userId: string, dayId: string): Promise<void> =>
-  DayService.delete(toObjectId(userId, "userId"), toObjectId(dayId, "dayId"));
-
-export const DayController = {
+export const daysControllers = {
   get: getDays,
   add: addDay,
-  delete: deleteDay,
 };

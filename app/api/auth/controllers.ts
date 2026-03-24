@@ -1,9 +1,9 @@
-import { Errors } from "@/lib/core/errors";
+import { Errors } from "@/lib/utils/errors";
 import { Jwt } from "@/lib/utils/jwt";
-import { AuthService } from "@/server/services/auth.service";
-import type { UserInput } from "@/types/modules/user.types";
+import { authServices } from "@/app/api/auth/services";
+import type { UserInput } from "@/modules/types/user.types";
 
-const signup = async (username: unknown, password: unknown): Promise<void> => {
+const signup = async (username: unknown, password: unknown) => {
   if (typeof username !== "string" || username.trim() === "") {
     throw Errors.BAD_REQUEST_ERROR("Username must be a non-empty string");
   }
@@ -16,13 +16,10 @@ const signup = async (username: unknown, password: unknown): Promise<void> => {
     password: password.trim(),
   };
 
-  await AuthService.signup(user);
+  await authServices.signup(user);
 };
 
-const login = async (
-  username: unknown,
-  password: unknown,
-): Promise<{ accessToken: string; refreshToken: string }> => {
+const login = async (username: unknown, password: unknown) => {
   if (typeof username !== "string" || username.trim() === "") {
     throw Errors.BAD_REQUEST_ERROR("Username must be a non-empty string");
   }
@@ -30,21 +27,20 @@ const login = async (
     throw Errors.BAD_REQUEST_ERROR("Password must be a non-empty string");
   }
 
-  const user = await AuthService.login({ username, password });
+  const user = await authServices.login({ username, password });
   const accessToken = Jwt.accessToken.sign(user._id.toString());
   const refreshToken = Jwt.refreshToken.sign(user._id.toString());
 
   return { accessToken, refreshToken };
 };
-const refresh = (
-  userId: string,
-): { accessToken: string; refreshToken: string } => {
+
+const refresh = (userId: string) => {
   const accessToken = Jwt.accessToken.sign(userId);
   const refreshToken = Jwt.refreshToken.sign(userId);
   return { accessToken, refreshToken };
 };
 
-export const AuthController = {
+export const authControllers = {
   signup,
   login,
   refresh,

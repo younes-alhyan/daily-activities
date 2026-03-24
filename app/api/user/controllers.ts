@@ -1,11 +1,11 @@
-import { Errors } from "@/lib/core/errors";
 import { cleanUser } from "@/lib/utils/cleanObject";
+import { Errors } from "@/lib/utils/errors";
 import { toObjectId } from "@/lib/utils/toObjectId";
-import { UserService } from "@/server/services/user.service";
-import type { UserInput, UserDTO } from "@/types/modules/user.types";
+import { userServices } from "@/app/api/user/services";
+import type { UserInput, UserDTO } from "@/modules/types/user.types";
 
 const getUser = async (id: string): Promise<UserDTO> => {
-  const doc = await UserService.get(toObjectId(id));
+  const doc = await userServices.get(toObjectId(id));
   return cleanUser(doc);
 };
 
@@ -29,14 +29,14 @@ const updateUser = async (
     );
   }
 
-  const doc = await UserService.update(toObjectId(id), updateData);
+  const doc = await userServices.update(toObjectId(id), updateData);
   return cleanUser(doc);
 };
 
 const deleteUser = (id: string): Promise<void> =>
-  UserService.delete(toObjectId(id));
+  userServices.delete(toObjectId(id));
 
-export const UserController = {
+export const userControllers = {
   get: getUser,
   update: updateUser,
   delete: deleteUser,

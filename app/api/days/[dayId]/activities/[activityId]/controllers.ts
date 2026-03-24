@@ -1,42 +1,18 @@
-import { Errors } from "@/lib/core/errors";
 import { cleanActivity } from "@/lib/utils/cleanObject";
+import { Errors } from "@/lib/utils/errors";
 import { toObjectId } from "@/lib/utils/toObjectId";
-import { ActivityService } from "@/server/services/activity.service";
+import { activityServices } from "@/app/api/days/[dayId]/activities/[activityId]/services";
 import {
   activityTypes,
   type ActivityType,
   type ActivityInput,
   type ActivityDTO,
-} from "@/types/modules/activity.types";
+} from "@/modules/types/activity.types";
 
 const isActivityType = (value: unknown): value is ActivityType => {
   return (
     typeof value === "string" && activityTypes.includes(value as ActivityType)
   );
-};
-
-const addActivity = async (
-  userId: string,
-  dayId: string,
-  type: unknown,
-  description: unknown,
-  state: unknown,
-): Promise<ActivityDTO> => {
-  if (!isActivityType(type)) {
-    throw Errors.BAD_REQUEST_ERROR("Invalid activity type");
-  }
-
-  const doc = await ActivityService.add(
-    toObjectId(userId, "userId"),
-    toObjectId(dayId, "dayId"),
-    {
-      type,
-      description: typeof description === "string" ? description : "",
-      state: typeof state === "boolean" ? state : false,
-    },
-  );
-
-  return cleanActivity(doc);
 };
 
 const updateActivity = async (
@@ -74,7 +50,7 @@ const updateActivity = async (
     throw Errors.BAD_REQUEST_ERROR("At least one field must be provided");
   }
 
-  const doc = await ActivityService.update(
+  const doc = await activityServices.update(
     toObjectId(userId, "userId"),
     toObjectId(dayId, "dayId"),
     toObjectId(activityId, "activityId"),
@@ -83,6 +59,17 @@ const updateActivity = async (
 
   return cleanActivity(doc);
 };
+
+const deleteActivity = (
+  userId: string,
+  dayId: string,
+  activityId: string,
+): Promise<void> =>
+  activityServices.delete(
+    toObjectId(userId, "userId"),
+    toObjectId(dayId, "dayId"),
+    toObjectId(activityId, "activityId"),
+  );
 
 const reorderActivity = async (
   userId: string,
@@ -94,7 +81,7 @@ const reorderActivity = async (
     throw Errors.BAD_REQUEST_ERROR("newIndex must be an integer");
   }
 
-  return ActivityService.reorder(
+  return activityServices.reorder(
     toObjectId(userId, "userId"),
     toObjectId(dayId, "dayId"),
     toObjectId(activityId, "activityId"),
@@ -102,20 +89,8 @@ const reorderActivity = async (
   );
 };
 
-const deleteActivity = (
-  userId: string,
-  dayId: string,
-  activityId: string,
-): Promise<void> =>
-  ActivityService.delete(
-    toObjectId(userId, "userId"),
-    toObjectId(dayId, "dayId"),
-    toObjectId(activityId, "activityId"),
-  );
-
-export const ActivityController = {
-  add: addActivity,
+export const activityControllers = {
   update: updateActivity,
-  reorder: reorderActivity,
   delete: deleteActivity,
+  reorder: reorderActivity,
 };
