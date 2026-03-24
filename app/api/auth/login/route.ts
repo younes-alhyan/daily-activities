@@ -1,16 +1,16 @@
 import { httpResponse } from "@/lib/http/httpResponse";
 import { httpRoute } from "@/lib/http/httpRoute";
-import { Responses } from "@/lib/core/responses";
-import { AuthController } from "@/server/controllers/auth.controller";
+import { authResponses } from "@/features/auth";
+import { authControllers } from "@/app/api/auth/controllers";
 
 export const POST = httpRoute(async (req) => {
   const { username, password } = await req.json();
-  const { accessToken, refreshToken } = await AuthController.login(
+  const { accessToken, refreshToken } = await authControllers.login(
     username,
     password,
   );
   return httpResponse.success(
-    Responses.auth.login({ accessToken }),
+    authResponses.login({ accessToken }),
     refreshToken,
   );
 });

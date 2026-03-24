@@ -1,12 +1,12 @@
 import { httpResponse } from "@/lib/http/httpResponse";
 import { httpRoute } from "@/lib/http/httpRoute";
-import { Responses } from "@/lib/core/responses";
 import { authMiddleware } from "@/lib/middlewares/authMiddleware";
-import { DayController } from "@/server/controllers/day.controller";
+import { dayResponses } from "@/features/day";
+import { dayControllers } from "@/app/api/days/[dayId]/controllers";
 
-export const DELETE = httpRoute(async (req) => {
+export const DELETE = httpRoute(async (req, params) => {
   const userId = authMiddleware(req);
-  const dayId = req.nextUrl.searchParams.get("dayId");
-  await DayController.delete(userId, dayId);
-  return httpResponse.success(Responses.days.day.delete());
+  const { dayId } = params;
+  await dayControllers.delete(userId, dayId);
+  return httpResponse.success(dayResponses.delete());
 });

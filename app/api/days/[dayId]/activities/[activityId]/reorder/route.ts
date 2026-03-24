@@ -1,14 +1,13 @@
 import { httpResponse } from "@/lib/http/httpResponse";
 import { httpRoute } from "@/lib/http/httpRoute";
-import { Responses } from "@/lib/core/responses";
 import { authMiddleware } from "@/lib/middlewares/authMiddleware";
-import { ActivityController } from "@/server/controllers/activity.controller";
+import { activityResponses } from "@/features/activity";
+import { activityControllers } from "@/app/api/days/[dayId]/activities/[activityId]/controllers";
 
-export const PATCH = httpRoute(async (req) => {
+export const PATCH = httpRoute(async (req, params) => {
   const userId = authMiddleware(req);
-  const dayId = req.nextUrl.searchParams.get("dayId")!;
-  const activityId = req.nextUrl.searchParams.get("activityId");
+  const { dayId, activityId } = params;
   const { newIndex } = await req.json();
-  await ActivityController.reorder(userId, dayId, activityId, newIndex);
-  return httpResponse.success(Responses.activities.activity.reorder());
+  await activityControllers.reorder(userId, dayId, activityId, newIndex);
+  return httpResponse.success(activityResponses.reorder());
 });
