@@ -1,4 +1,4 @@
-import { AuthProvider } from "@/client/contexts/AuthContext";
+import { SessionProvider } from "@/client/contexts/SessionContext";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
