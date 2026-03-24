@@ -1,26 +1,8 @@
 import { runService } from "@/lib/db";
-import { Errors } from "@/lib/core/errors";
-import { DayModel } from "@/server/models/day.model";
+import { Errors } from "@/lib/utils/errors";
+import { DayModel } from "@/modules/models/day.model";
 import type { Types } from "mongoose";
-import type { ActivityInput } from "@/types/modules/activity.types";
-import type { DayDoc } from "@/types/modules/day.types";
-
-const addActivity = (
-  userId: Types.ObjectId,
-  dayId: Types.ObjectId,
-  activity: ActivityInput,
-) =>
-  runService(async () => {
-    const doc = await DayModel.findOneAndUpdate(
-      { _id: dayId, userId },
-      { $push: { activities: activity } },
-      { new: true },
-    );
-    if (!doc) throw Errors.NOT_FOUND_ERROR("Day not found");
-
-    const activities = doc.toObject<DayDoc>().activities;
-    return activities[activities.length - 1];
-  });
+import type { ActivityInput } from "@/modules/types/activity.types";
 
 const updateActivity = (
   userId: Types.ObjectId,
@@ -38,6 +20,20 @@ const updateActivity = (
     Object.assign(activityDoc, activity);
     await doc.save();
     return activityDoc;
+  });
+
+const deleteActivity = (
+  userId: Types.ObjectId,
+  dayId: Types.ObjectId,
+  activityId: Types.ObjectId,
+) =>
+  runService(async () => {
+    const doc = await DayModel.findOneAndUpdate(
+      { _id: dayId, userId },
+      { $pull: { activities: { _id: activityId } } },
+    );
+
+    if (!doc) throw Errors.NOT_FOUND_ERROR("Day not found");
   });
 
 const reorderActivity = (
@@ -65,23 +61,8 @@ const reorderActivity = (
     await doc.save();
   });
 
-const deleteActivity = (
-  userId: Types.ObjectId,
-  dayId: Types.ObjectId,
-  activityId: Types.ObjectId,
-) =>
-  runService(async () => {
-    const doc = await DayModel.findOneAndUpdate(
-      { _id: dayId, userId },
-      { $pull: { activities: { _id: activityId } } },
-    );
-
-    if (!doc) throw Errors.NOT_FOUND_ERROR("Day not found");
-  });
-
-export const ActivityService = {
-  add: addActivity,
+export const activityServices = {
   update: updateActivity,
-  reorder: reorderActivity,
   delete: deleteActivity,
+  reorder: reorderActivity,
 };

@@ -1,9 +1,9 @@
 import { runService } from "@/lib/db";
-import { Errors } from "@/lib/core/errors";
-import { DayModel } from "@/server/models/day.model";
-import { UserModel } from "@/server/models/user.model";
+import { Errors } from "@/lib/utils/errors";
+import { DayModel } from "@/modules/models/day.model";
+import { UserModel } from "@/modules/models/user.model";
 import type { Types } from "mongoose";
-import type { UserDoc } from "@/types/modules/user.types";
+import type { UserDoc } from "@/modules/types/user.types";
 
 const getUser = (id: Types.ObjectId) =>
   runService(async () => {
@@ -33,7 +33,7 @@ const deleteUser = (id: Types.ObjectId) =>
     await DayModel.deleteMany({ userId: id });
   });
 
-export const UserService = {
+export const userServices = {
   get: getUser,
   update: updateUser,
   delete: deleteUser,
