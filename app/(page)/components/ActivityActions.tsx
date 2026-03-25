@@ -4,7 +4,7 @@ import { Button } from "@/client/components/ui/button";
 interface ActivityActionsProps {
   isEditing: boolean;
   toggleEditing: () => void;
-  discardChanges: () => void;
+  onDiscardChanges: () => void;
   updateActivityHandler: () => void;
   deleteActivcityHandler: () => void;
 }
@@ -12,37 +12,23 @@ interface ActivityActionsProps {
 export function ActivityActions({
   isEditing,
   toggleEditing,
-  discardChanges,
+  onDiscardChanges,
   updateActivityHandler,
   deleteActivcityHandler,
 }: ActivityActionsProps) {
   if (isEditing) {
     return (
       <>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => {
-            updateActivityHandler();
-            toggleEditing();
-          }}
-        >
+        <Button size="icon" variant="ghost" onClick={updateActivityHandler}>
           <Check className="w-5 h-5 text-accent-green" />
         </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => {
-            discardChanges();
-            toggleEditing();
-          }}
-        >
+        <Button size="icon" variant="ghost" onClick={onDiscardChanges}>
           <X className="w-5 h-5" />
         </Button>
       </>
     );
   }
-  
+
   return (
     <>
       <Button size="icon" variant="ghost" onClick={toggleEditing}>

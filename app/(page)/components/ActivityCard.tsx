@@ -30,6 +30,16 @@ export function ActivityCard({
     setActivityInput((v) => ({ ...v, ...patch }));
   };
 
+  const onDiscardChanges = () => {
+    toggleEditing();
+    onUpdateActivityInput(activity);
+  };
+
+  const updateActivityHandler = () => {
+    toggleEditing();
+    updateActivity.call({ body: activityInput });
+  };
+
   return (
     <Reorder.Item
       key={activity.id}
@@ -55,10 +65,8 @@ export function ActivityCard({
               <ActivityActions
                 isEditing={isEditing}
                 toggleEditing={toggleEditing}
-                discardChanges={() => onUpdateActivityInput(activity)}
-                updateActivityHandler={() =>
-                  updateActivity.call({ body: activityInput })
-                }
+                onDiscardChanges={onDiscardChanges}
+                updateActivityHandler={updateActivityHandler}
                 deleteActivcityHandler={deleteActivity.call}
               />
             </div>
@@ -79,11 +87,16 @@ export function ActivityCard({
           {isEditing ? (
             <Textarea
               value={activityInput.description}
+              className="resize-none overflow-hidden min-h-10"
+              placeholder="Activity description"
               onChange={(e) =>
                 onUpdateActivityInput({ description: e.target.value })
               }
-              placeholder="Activity description"
-              className="resize-none overflow-hidden min-h-10"
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" || e.shiftKey) return;
+                e.preventDefault();
+                updateActivityHandler();
+              }}
             />
           ) : (
             <p className="text-sm text-muted-foreground whitespace-pre-wrap min-h-10">
