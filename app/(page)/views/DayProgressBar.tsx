@@ -1,11 +1,11 @@
 import { Progress } from "@/client/components/ui/progress";
-import type { ActivityDTO } from "@/types/modules/activity.types";
+import type { ActivityDTO } from "@/modules/types/activity.types";
 
-interface ActivitiesProgressBarProps {
+interface DayProgressBarProps {
   activities: ActivityDTO[];
 }
 
-export function ActivitiesProgressBar({ activities }: ActivitiesProgressBarProps) {
+export function DayProgressBar({ activities }: DayProgressBarProps) {
   const total = activities.length;
   const checked = activities.filter((v) => v.state).length;
   const value = total === 0 ? 0 : (checked / total) * 100;

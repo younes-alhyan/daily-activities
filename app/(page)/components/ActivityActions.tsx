@@ -16,7 +16,7 @@ export function ActivityActions({
   updateActivityHandler,
   deleteActivcityHandler,
 }: ActivityActionsProps) {
-  if (isEditing)
+  if (isEditing) {
     return (
       <>
         <Button
@@ -41,7 +41,8 @@ export function ActivityActions({
         </Button>
       </>
     );
-
+  }
+  
   return (
     <>
       <Button size="icon" variant="ghost" onClick={toggleEditing}>

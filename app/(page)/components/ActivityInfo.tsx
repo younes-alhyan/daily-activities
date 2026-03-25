@@ -9,7 +9,7 @@ import {
 import {
   activityTypes,
   type ActivityType,
-} from "@/types/modules/activity.types";
+} from "@/modules/types/activity.types";
 
 const activitiesInfoMap = {
   watching: { icon: Film, color: "text-accent-red", duration: 2 },
@@ -21,20 +21,21 @@ const activitiesInfoMap = {
 interface ActivityInfoProps {
   isEditing: boolean;
   activityType: ActivityType;
-  updateType: (type: ActivityType) => void;
+  setActivityType: (activityType: ActivityType) => void;
 }
 
 export function ActivityInfo({
   isEditing,
   activityType,
-  updateType,
+  setActivityType,
 }: ActivityInfoProps) {
   const {
     icon: ActivityIcon,
     color,
     duration,
   } = activitiesInfoMap[activityType];
-  if (isEditing)
+
+  if (isEditing) {
     return (
       <div className="flex items-center gap-2 min-w-0">
         <DropdownMenu>
@@ -54,7 +55,7 @@ export function ActivityInfo({
                 <DropdownMenuItem
                   key={a}
                   className="hover:bg-input/30 group"
-                  onClick={() => updateType(a)}
+                  onClick={() => setActivityType(a)}
                 >
                   <Icon className={`${color} group-hover:${color}`} />
                   {a}
@@ -65,7 +66,7 @@ export function ActivityInfo({
         </DropdownMenu>
       </div>
     );
-
+  }
   return (
     <div className="flex items-center gap-2 min-w-0">
       <ActivityIcon className={color} />

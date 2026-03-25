@@ -1,36 +1,47 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/client/components/ui/button";
+import type { SetStateAction } from "react";
 
 interface DaysNavProps {
   daysCount: number;
   selectedIndex: number;
-  onSelectNext: () => void;
-  onSelectPrevious: () => void;
+  setSelectedIndex: React.Dispatch<SetStateAction<number>>;
 }
 
 export function DaysNav({
   daysCount,
   selectedIndex,
-  onSelectNext,
-  onSelectPrevious,
+  setSelectedIndex,
 }: DaysNavProps) {
+  const onSelectNext = () => {
+    setSelectedIndex((prev) => Math.min(prev + 1, daysCount - 1));
+  };
+
+  const onSelectPrevious = () => {
+    setSelectedIndex((prev) => Math.max(prev - 1, 0));
+  };
+
   return (
     <div className="flex items-center gap-4">
-      {selectedIndex > 0 ? (
-        <Button variant="ghost" size="icon" onClick={onSelectPrevious}>
-          <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-        </Button>
-      ) : (
-        <div className="w-9" />
-      )}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onSelectPrevious}
+        className={selectedIndex === 0 ? "invisible" : ""}
+      >
+        <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+      </Button>
 
       <h1 className="text-xl font-medium">Day {selectedIndex + 1}</h1>
 
-      {selectedIndex < daysCount - 1 && (
-        <Button variant="ghost" size="icon" onClick={onSelectNext}>
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-        </Button>
-      )}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onSelectNext}
+        className={selectedIndex === daysCount - 1 ? "invisible" : ""}
+      >
+        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+      </Button>
     </div>
   );
 }

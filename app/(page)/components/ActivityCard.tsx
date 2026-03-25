@@ -1,91 +1,97 @@
 "use client";
+import { Reorder } from "framer-motion";
 import { useState } from "react";
+import { useActivity } from "@/app/(page)/contexts/ActivityContext";
+import { ActivityActions } from "@/app/(page)/components/ActivityActions";
+import { ActivityInfo } from "@/app/(page)/components/ActivityInfo";
 import { Card, CardContent } from "@/client/components/ui/card";
 import { Checkbox } from "@/client/components/ui/checkbox";
 import { Textarea } from "@/client/components/ui/textarea";
-import { ActivityActions } from "@/app/(page)/components/ActivityActions";
-import { ActivityInfo } from "@/app/(page)/components/ActivityInfo";
-import type { ApiHooksRoutes } from "@/types/core/api-hooks.types";
-import type { ActivityDTO, ActivityInput } from "@/types/modules/activity.types";
+import type {
+  ActivityDTO,
+  ActivityInput,
+} from "@/modules/types/activity.types";
 
 interface ActivityCardProps {
   activity: ActivityDTO;
-  updateActivity: ApiHooksRoutes["activities"]["activity"]["update"]["Hook"];
-  deleteActivity: ApiHooksRoutes["activities"]["activity"]["delete"]["Hook"];
+  findActivityIndex: (activityId: string) => number;
 }
 
 export function ActivityCard({
   activity,
-  updateActivity,
-  deleteActivity,
+  findActivityIndex,
 }: ActivityCardProps) {
   const [activityInput, setActivityInput] = useState<ActivityInput>(activity);
   const [isEditing, setIsEditing] = useState(false);
+  const { updateActivity, deleteActivity, reorderActivity } = useActivity();
 
   const toggleEditing = () => setIsEditing((v) => !v);
-  const updateInput = (patch: Partial<ActivityInput>) => {
+  const onUpdateActivityInput = (patch: Partial<ActivityInput>) => {
     setActivityInput((v) => ({ ...v, ...patch }));
   };
 
-  const updateActivityHandler = () => {
-    updateActivity.call({ activityId: activity.id, body: activityInput });
-  };
-  const deleteActivityHandler = () => {
-    deleteActivity.call({ activityId: activity.id });
-  };
-
   return (
-    <Card
-      className={`transition-opacity ${activityInput.state ? "opacity-50" : "opacity-100"} rounded-md`}
+    <Reorder.Item
+      key={activity.id}
+      value={activity}
+      onDragEnd={() => {
+        reorderActivity.call({
+          body: { newIndex: findActivityIndex(activity.id) },
+        });
+      }}
     >
-      <CardContent className="flex flex-col gap-3">
-        {/* Top Row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ActivityInfo
-              isEditing={isEditing}
-              activityType={activityInput.type}
-              updateType={(type) => updateInput({ type })}
-            />
-            <ActivityActions
-              isEditing={isEditing}
-              toggleEditing={toggleEditing}
-              discardChanges={() => {
-                console.log(activity);
-                updateInput(activity);
+      <Card
+        className={`transition-opacity ${activityInput.state ? "opacity-50" : "opacity-100"} rounded-md`}
+      >
+        <CardContent className="flex flex-col gap-3">
+          {/* Top Row */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ActivityInfo
+                isEditing={isEditing}
+                activityType={activityInput.type}
+                setActivityType={(type) => onUpdateActivityInput({ type })}
+              />
+              <ActivityActions
+                isEditing={isEditing}
+                toggleEditing={toggleEditing}
+                discardChanges={() => onUpdateActivityInput(activity)}
+                updateActivityHandler={() =>
+                  updateActivity.call({ body: activityInput })
+                }
+                deleteActivcityHandler={deleteActivity.call}
+              />
+            </div>
+            {/* Checkbox */}
+            <Checkbox
+              checked={activityInput.state}
+              onCheckedChange={() => {
+                const newState = !activityInput.state;
+                onUpdateActivityInput({ state: newState });
+                updateActivity.call({
+                  body: { ...activityInput, state: newState },
+                });
               }}
-              updateActivityHandler={updateActivityHandler}
-              deleteActivcityHandler={deleteActivityHandler}
             />
           </div>
-          {/* Checkbox */}
-          <Checkbox
-            checked={activityInput.state}
-            onCheckedChange={() => {
-              const newState = !activityInput.state;
-              updateInput({ state: newState });
-              updateActivity.call({
-                activityId: activity.id,
-                body: { ...activityInput, state: newState },
-              });
-            }}
-          />
-        </div>
 
-        {/* Description */}
-        {isEditing ? (
-          <Textarea
-            value={activityInput.description}
-            onChange={(e) => updateInput({ description: e.target.value })}
-            placeholder="Activity description"
-            className="resize-none overflow-hidden min-h-10"
-          />
-        ) : (
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap min-h-10">
-            {activityInput.description || "Add Description"}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+          {/* Description */}
+          {isEditing ? (
+            <Textarea
+              value={activityInput.description}
+              onChange={(e) =>
+                onUpdateActivityInput({ description: e.target.value })
+              }
+              placeholder="Activity description"
+              className="resize-none overflow-hidden min-h-10"
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap min-h-10">
+              {activityInput.description || "Add Description"}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </Reorder.Item>
   );
 }
