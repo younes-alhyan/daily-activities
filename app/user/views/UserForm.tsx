@@ -9,7 +9,7 @@ import {
 } from "@/client/components/ui/card";
 import { Input } from "@/client/components/ui/input";
 import { Label } from "@/client/components/ui/label";
-import type { UserInput, UserDTO } from "@/types/modules/user.types";
+import type { UserInput, UserDTO } from "@/modules/types/user.types";
 
 interface UserFormProps {
   user: UserDTO;

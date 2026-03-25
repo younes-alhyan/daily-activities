@@ -4,7 +4,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/client/components/ui/card";
-import type { UserDTO } from "@/types/modules/user.types";
+import type { UserDTO } from "@/modules/types/user.types";
 
 interface UserDataProps {
   user: UserDTO;
